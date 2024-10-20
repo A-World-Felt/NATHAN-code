@@ -5,26 +5,44 @@ import busio
 import sdcardio
 import board
 import time
+import os
 
-
-MOSI= board.GP3
+MOSI = board.GP3
 MISO = board.GP0
 clk = board.GP2
 cs = board.GP1
 
 spi = busio.SPI(clk, MOSI=MOSI, MISO=MISO)
 
-sd = sdcardio.SDCard(spi, cs)
+if spi.try_lock():
+    print("SPI is available")
+    spi.unlock()
 
-vfs = storage.VfsFat(sd)
-storage.mount(vfs, '/sd')
+time.sleep(1)  # Petit délai avant l'initialisation
 
+
+try:
+    sd = sdcardio.SDCard(spi, cs)
+    print("SD Card initialized successfully")
+except Exception as e:
+    print("Failed to initialize SD Card:", e)
+
+try:
+    vfs = storage.VfsFat(sd)
+    storage.mount(vfs, '/sd')
+    print("SD Card mounted successfully at /sd")
+except Exception as e:
+    print("Failed to mount SD Card:", e)
 
 
 
 
 
 class Memoire:
+    
+    def print_memoire():
+        for fichier in os.listdir("/sd"):
+            print(fichier)
 
     def reset_memoire():
         with open("/sd/MemoireArcade.txt", 'w') as Memoire_txt:
@@ -131,6 +149,8 @@ class Memoire:
 
 
     def lire_memoire_txt(ModeDeJeu):
+        
+        Memoire.print_memoire()
         if ModeDeJeu == "Arcade":
             with open("/sd/MemoireArcade.txt", "r") as Memoire_txt:
 
@@ -179,7 +199,7 @@ import digitalio
 import audiopwmio
 
 audio = AudioOut(board.GP21)
-path = "/sd/sounds/"
+
 
 
 class Son:
@@ -196,7 +216,7 @@ class Son:
         print(os.listdir("/sd/sounds"))
 
 
-    def play_sound(bouton, son):
+    def play_sound(bouton, son, path = "/sd/sounds/" ):
         print(path+son)
         with open(path+son, "rb") as wave_file:
             wave = WaveFile(wave_file)
@@ -207,7 +227,7 @@ class Son:
                 pass # code pendant que le son jou
         wave_file.close()
 
-    def play_soundModeDeJeu(bouton, son):
+    def play_soundModeDeJeu(bouton, son, path = "/sd/sounds/"):
         print(path+son)
         with open(path+son, "rb") as wave_file:
             wave = WaveFile(wave_file)
@@ -217,7 +237,7 @@ class Son:
         #Son.popDelete()
         wave_file.close()
 
-    def play_soundMenu(bouton,SonCommande):
+    def play_soundMenu(bouton,SonCommande, path = "/sd/sounds/"):
 
         with open(path+"MenuMusic.wav", "rb") as wave_file:
             wave = WaveFile(wave_file)
