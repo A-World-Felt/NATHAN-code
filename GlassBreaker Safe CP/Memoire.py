@@ -5,44 +5,26 @@ import busio
 import sdcardio
 import board
 import time
-import os
 
-MOSI = board.GP3
+
+MOSI= board.GP3
 MISO = board.GP0
 clk = board.GP2
 cs = board.GP1
 
 spi = busio.SPI(clk, MOSI=MOSI, MISO=MISO)
 
-if spi.try_lock():
-    print("SPI is available")
-    spi.unlock()
+sd = sdcardio.SDCard(spi, cs)
 
-time.sleep(1)  # Petit délai avant l'initialisation
+vfs = storage.VfsFat(sd)
+storage.mount(vfs, '/sd')
 
-
-try:
-    sd = sdcardio.SDCard(spi, cs)
-    print("SD Card initialized successfully")
-except Exception as e:
-    print("Failed to initialize SD Card:", e)
-
-try:
-    vfs = storage.VfsFat(sd)
-    storage.mount(vfs, '/sd')
-    print("SD Card mounted successfully at /sd")
-except Exception as e:
-    print("Failed to mount SD Card:", e)
 
 
 
 
 
 class Memoire:
-    
-    def print_memoire():
-        for fichier in os.listdir("/sd"):
-            print(fichier)
 
     def reset_memoire():
         with open("/sd/MemoireArcade.txt", 'w') as Memoire_txt:
@@ -149,8 +131,6 @@ class Memoire:
 
 
     def lire_memoire_txt(ModeDeJeu):
-        
-        Memoire.print_memoire()
         if ModeDeJeu == "Arcade":
             with open("/sd/MemoireArcade.txt", "r") as Memoire_txt:
 
@@ -198,52 +178,46 @@ from audiopwmio import PWMAudioOut as AudioOut
 import digitalio
 import audiopwmio
 
-audio = AudioOut(board.GP21)
-
+#audio = AudioOut(board.GP21)
+path = "/sd/sounds/"
 
 
 class Son:
 
-    def popDelete():
-
-        audio
-        for i in range(0,10):
-            audio.volume = (1-(i/10))
-            time.sleep(0.1)
 
     def afficherSon():
         import os
         print(os.listdir("/sd/sounds"))
 
 
-    def play_sound(bouton, son, path = "/sd/sounds/" ):
+    def play_sound(bouton, son, mixer):
         print(path+son)
         with open(path+son, "rb") as wave_file:
             wave = WaveFile(wave_file)
-            audio.play(wave)
-            while audio.playing:
+            mixer.voice[0].play(wave)
+            while mixer.voice[0].playing:
                 if bouton.bouton_pin15.value or bouton.bouton_pin14.value or bouton.bouton_pin13.value or bouton.bouton_pin10.value or bouton.bouton_pin9.value:
                     break
                 pass # code pendant que le son jou
         wave_file.close()
 
-    def play_soundModeDeJeu(bouton, son, path = "/sd/sounds/"):
+    def play_soundModeDeJeu(bouton, son, mixer):
         print(path+son)
         with open(path+son, "rb") as wave_file:
             wave = WaveFile(wave_file)
-            audio.play(wave)
-            while audio.playing:
+            mixer.voice[0].play(wave)
+            while mixer.voice[0].playing:
                 pass # code pendant que le son jou
         #Son.popDelete()
         wave_file.close()
 
-    def play_soundMenu(bouton,SonCommande, path = "/sd/sounds/"):
+    def play_soundMenu(bouton,SonCommande, mixer):
 
         with open(path+"MenuMusic.wav", "rb") as wave_file:
             wave = WaveFile(wave_file)
             while True:
-                audio.play(wave)
-                while audio.playing:
+                mixer.voice[0].play(wave)
+                while mixer.voice[0].playing:
                     if bouton.bouton_pin14.value:
                         wave_file.close()
                         #time.sleep(0.5)
@@ -256,7 +230,7 @@ class Son:
                     pass # code pendant que le son jou
         wave_file.close()
 
-    def play_soundScore(bouton, score):
+    def play_soundScore(bouton, score, mixer):
         centaine = 0
         dizaine = 0
         unite = 0
@@ -266,13 +240,13 @@ class Son:
         unite = int((score-centaine*100-dizaine*10))
 
         for i in range(centaine):
-            Son.play_sound(bouton, "Point100.wav")
+            Son.play_sound(bouton, "Point100.wav", mixer)
 
         for i in range(dizaine):
-            Son.play_sound(bouton, "Point10.wav")
+            Son.play_sound(bouton, "Point10.wav", mixer)
 
         for i in range(unite):
-            Son.play_sound(bouton, "Point1.wav")
+            Son.play_sound(bouton, "Point1.wav", mixer)
 
 
 #Memoire.ecrire_memoire_txt(3)
