@@ -7,20 +7,32 @@ import board
 import time
 
 
-MOSI= board.GP3
+
+MOSI = board.GP3
 MISO = board.GP0
 clk = board.GP2
 cs = board.GP1
 
 spi = busio.SPI(clk, MOSI=MOSI, MISO=MISO)
 
-sd = sdcardio.SDCard(spi, cs)
+max_attempts = 3
+delay_seconds = 2
 
-vfs = storage.VfsFat(sd)
-storage.mount(vfs, '/sd')
-
-
-
+for attempt in range(1, max_attempts + 1):
+    try:
+        print(f"Tentative {attempt} de montage SD...")
+        sd = sdcardio.SDCard(spi, cs)
+        vfs = storage.VfsFat(sd)
+        storage.mount(vfs, "/sd")
+        print("Carte SD montée avec succès.")
+        break
+    except Exception as e:
+        print(f"Échec de la tentative {attempt}: {e}")
+        if attempt < max_attempts:
+            print(f"⏳ Nouvelle tentative dans {delay_seconds} secondes...")
+            time.sleep(delay_seconds)
+        else:
+            print("Impossible de monter la carte SD après plusieurs essais.")
 
 
 
@@ -218,12 +230,12 @@ class Son:
             while True:
                 mixer.voice[0].play(wave)
                 while mixer.voice[0].playing:
-                    if bouton.bouton_pin14.value:
+                    if bouton.bouton_pin10.value or bouton.bouton_pin9.value:
                         wave_file.close()
                         #time.sleep(0.5)
                         return "ModeDeJeu"
 
-                    if bouton.bouton_pin13.value:
+                    if bouton.bouton_pin14.value:
                         wave_file.close()
                         #time.sleep(0.5)
                         return "DebuterPartie"
