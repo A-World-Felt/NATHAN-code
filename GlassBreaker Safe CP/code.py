@@ -70,6 +70,11 @@ class Bouton:
     lumiere_pin9.direction = digitalio.Direction.OUTPUT
 
 
+    motorLeft = digitalio.DigitalInOut(board.GP26)
+    motorLeft.direction = digitalio.Direction.OUTPUT
+    motorRight = digitalio.DigitalInOut(board.GP27)
+    motorRight.direction = digitalio.Direction.OUTPUT
+
 
     dicti = {"modeDeJeu" : "Arcade", "pin" : 0, "score" : 0, "reponse" : 0, "debut" : False, "gameover" : False, "record" : {"Arcade" : 0, "Voice" : 0, "Reverse" : 0, "Voice" : 0, "Light" : 0, "Megamix" : 0}, "lumiere" : {"pin13" : lumiere_pin13, "pin14" : lumiere_pin14, "pin15" : lumiere_pin15, "pin9": lumiere_pin9, "pin10": lumiere_pin10}}
 
@@ -123,15 +128,67 @@ dicti = Bouton.dicti
 
 
 def hasard(dicti):
-                #led_pin12 = machine.Pin(12, machine.Pin.OUT)
-                #led_pin12.value(1) #led indiquant qu'une partie est en jeu
+    #led_pin12 = machine.Pin(12, machine.Pin.OUT)
+    #led_pin12.value(1) #led indiquant qu'une partie est en jeu
 
-                lumiere_pin12.value = 1
+    lumiere_pin12.value = 1
 
-                pin = ['pin13', 'pin14', 'pin15', 'pin10', 'pin9']
-                import random
-                x = random.randint(0, 4)
-                dicti["reponse"] = pin[x]
+    pin = ['pin13', 'pin14', 'pin15', 'pin10', 'pin9']
+    import random
+    x = random.randint(0, 4)
+    dicti["reponse"] = pin[x]
+                
+def executeLeds():
+
+    lumiere_pin13.value = 1
+    time.sleep(0.2)
+    lumiere_pin13.value = 0
+    lumiere_pin14.value = 1
+    time.sleep(0.2)
+    lumiere_pin14.value = 0
+    lumiere_pin15.value = 1
+    time.sleep(0.2)
+    lumiere_pin15.value = 0
+    lumiere_pin10.value = 1
+    time.sleep(0.2)
+    lumiere_pin10.value = 0
+    lumiere_pin9.value = 1
+    time.sleep(0.2)
+    lumiere_pin9.value = 0
+
+class Motors:
+
+
+
+
+    @staticmethod
+    def vibrate(motor1, motor2 = None):
+        print("Motors")
+        motor1.value = 1
+        if motor2 != None:
+            motor2.value = 1
+        time.sleep(0.25)
+        motor1.value = 0
+        if motor2 != None:
+            motor2.value = 0
+
+
+
+def chooseMotorToVibrate(dicti, allMotor = False):
+
+    if allMotor:
+        Motors.vibrate(Bouton.motorLeft, Bouton.motorRight)
+        return
+
+    if dicti["pin"] == "pin13" or dicti["pin"] == "pin10" :
+       Motors.vibrate(Bouton.motorLeft)
+       return
+
+    elif dicti["pin"] == "pin14":
+       Motors.vibrate(Bouton.motorLeft, Bouton.motorRight)
+       return
+
+    Motors.vibrate(Bouton.motorRight)
 
 
 
@@ -245,6 +302,7 @@ def timer(dicti, mixer):
 
 def correction(dicti, mixer):
     if dicti["reponse"] == dicti["pin"]:
+        chooseMotorToVibrate(dicti)
         print('correct')
         Son.play_sound(Bouton, f"{Bouton.sonHit[dicti["pin"]]}", mixer)
         dicti["score"] += 1
@@ -259,6 +317,7 @@ def correction(dicti, mixer):
         dicti["pin"]=0
     else:
         if dicti["gameover"] != True:
+            chooseMotorToVibrate(dicti, True)
             Son.play_sound(bouton, "Fail.wav", mixer)
             Son.play_sound(bouton, "GlassMasterLaugh.wav", mixer)
             Son.play_sound(bouton, "GlassMasterIntermission6.wav", mixer)
@@ -366,6 +425,7 @@ def Menu(Bouton, mixer):
 
 while True:
     audio.play(mixer)
+    executeLeds()
     Son.play_sound(Bouton, "GlassMasterIntro.wav", mixer)
     while audio.playing:
         if Bouton.dicti["debut"] == True:
