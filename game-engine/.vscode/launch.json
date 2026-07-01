@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Game",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/test_game",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+
+            "preLaunchTask": "build",
+
+            "setupCommands": [
+                {
+                    "description": "Enable pretty printing",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}
