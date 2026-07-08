@@ -1,5 +1,6 @@
 #include "engine.hpp"
-#include "node.hpp"
+#include "tree_traverser.hpp"
+#include "../node/node.hpp"
 
 #include <chrono>
 #include <thread>
@@ -8,10 +9,15 @@ void Engine::set_root(std::unique_ptr<Node> scene) {
     root = std::move(scene);
 }
 
+void Engine::stop() {
+    running = false;
+}
+
 void Engine::run() {
     if (!root) return;
 
-    root->setup();
+    // Setup entire tree using iterative traversal - automatic for all nodes
+    TreeTraverser::traverse_setup(root.get());
 
     using clock = std::chrono::high_resolution_clock;
 
@@ -33,9 +39,9 @@ void Engine::run() {
 
         accumulator += frame_time;
 
-        // FIXED UPDATE LOOP
+        // FIXED UPDATE LOOP - automatic for all nodes using iterative traversal
         while (accumulator >= fixed_dt) {
-            root->loop(fixed_dt); // treat loop as FIXED STEP
+            TreeTraverser::traverse_loop(root.get(), fixed_dt);
             accumulator -= fixed_dt;
         }
 
