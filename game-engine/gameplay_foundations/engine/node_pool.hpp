@@ -3,8 +3,9 @@
 #include <memory>
 #include <vector>
 
-// Forward declaration
+// Forward declarations
 class Node;
+class EventNode;
 
 // NodePool manages ownership and lifecycle of all Nodes
 // This is separate from the tree structure (which uses raw pointers)

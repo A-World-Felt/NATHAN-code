@@ -37,6 +37,4 @@ private:
     NodePool node_pool_;  // Owns all nodes
     bool running = true;
     
-    // Singleton instance
-    static Engine* instance_;
 };

@@ -6,18 +6,13 @@
 #include <iostream>
 #include <thread>
 
-// Singleton instance definition
-Engine* Engine::instance_ = nullptr;
-
 Engine::Engine() : root(nullptr), running(true) {
     // NodePool is initialized as a member
 }
 
 Engine& Engine::instance() {
-    if (!instance_) {
-        instance_ = new Engine();
-    }
-    return *instance_;
+    static Engine instance;  // Meyer's singleton
+    return instance;
 }
 
 void Engine::set_root(std::unique_ptr<Node> scene) {
