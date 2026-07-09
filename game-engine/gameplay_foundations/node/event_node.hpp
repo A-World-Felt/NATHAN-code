@@ -25,10 +25,12 @@ public:
     // Emit event to children only
     template<typename T>
     void emit_to_children(std::string event_type, const T& data) {
-        for (auto& child : children) {
-            if (auto* event_child = dynamic_cast<EventNode*>(child.get())) {
-                event_child->emit_internal<T>(event_type, data, this);
-                event_child->emit_to_children<T>(event_type, data);
+        for (Node* child : children) {
+            if (!child->destroyed) {
+                if (EventNode* event_child = dynamic_cast<EventNode*>(child)) {
+                    event_child->emit_internal<T>(event_type, data, this);
+                    event_child->emit_to_children<T>(event_type, data);
+                }
             }
         }
     }

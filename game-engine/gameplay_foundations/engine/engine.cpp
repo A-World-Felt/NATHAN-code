@@ -1,12 +1,31 @@
 #include "engine.hpp"
-#include "tree_traverser.hpp"
+#include "node_pool.hpp"
 #include "../node/node.hpp"
 
 #include <chrono>
+#include <iostream>
 #include <thread>
 
+// Singleton instance definition
+Engine* Engine::instance_ = nullptr;
+
+Engine::Engine() : root(nullptr), running(true) {
+    // NodePool is initialized as a member
+}
+
+Engine& Engine::instance() {
+    if (!instance_) {
+        instance_ = new Engine();
+    }
+    return *instance_;
+}
+
 void Engine::set_root(std::unique_ptr<Node> scene) {
-    root = std::move(scene);
+    root = scene.get();
+    if (scene) {
+        node_pool_.create(std::move(scene));
+        // setup() is called automatically by NodePool::create()
+    }
 }
 
 void Engine::stop() {
@@ -16,8 +35,7 @@ void Engine::stop() {
 void Engine::run() {
     if (!root) return;
 
-    // Setup entire tree using iterative traversal - automatic for all nodes
-    TreeTraverser::traverse_setup(root.get());
+    std::cout << "[Engine] Starting game loop...\n";
 
     using clock = std::chrono::high_resolution_clock;
 
@@ -39,9 +57,17 @@ void Engine::run() {
 
         accumulator += frame_time;
 
-        // FIXED UPDATE LOOP - automatic for all nodes using iterative traversal
+        // Process destroyed nodes BEFORE traversal
+        node_pool_.cleanup_destroyed();
+
+        // FIXED UPDATE LOOP - iterate all nodes in pool
         while (accumulator >= fixed_dt) {
-            TreeTraverser::traverse_loop(root.get(), fixed_dt);
+            // Loop through all active nodes
+            for (auto& node_ptr : node_pool_.get_pool()) {
+                if (!node_ptr->destroyed) {
+                    node_ptr->loop(fixed_dt);
+                }
+            }
             accumulator -= fixed_dt;
         }
 

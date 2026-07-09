@@ -15,13 +15,12 @@ struct ScoreEvent {
     std::string source;
 };
 
-// Forward declarations are NOT needed here because we define everything in same header
-// (but could be used if you split further later)
+// --- Game Entities ---
 
 class Player : public EventNode {
 public:
     float x = 0, y = 0;
-    float speed = 15.0f; // Moderate speed for demo
+    float speed = 15.0f;
     int coins_collected = 0;
     int jump_count = 0;
     int last_position = 0;
@@ -48,10 +47,16 @@ public:
     void loop(float delta) override {}
 };
 
-class MainScene : public EventNode {
+// --- MiniGame Scene ---
+
+class MiniGame : public EventNode {
 public:
-    MainScene();
+    MiniGame();
 
     void setup() override;
-    // loop() no longer needed - handled automatically by Engine
+    void loop(float delta) override;
+    void cleanup() override;
+
+private:
+    float timer_ = 0.0f;
 };

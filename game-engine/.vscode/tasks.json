@@ -2,18 +2,15 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
-            "type": "shell",
-            "command": "bash",
-            "args": [
-                "-c",
-                "cmake -S . -B build && cmake --build build"
+            "type": "cmake",
+            "label": "CMake: clean rebuild",
+            "command": "cleanRebuild",
+            "targets": [
+                "all"
             ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": []
+            "group": "build",
+            "problemMatcher": [],
+            "detail": "CMake template clean rebuild task"
         }
     ]
 }

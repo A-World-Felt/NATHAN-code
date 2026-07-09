@@ -26,7 +26,8 @@ add_library(gameplay_foundations
     # Engine
     gameplay_foundations/engine/engine.hpp
     gameplay_foundations/engine/engine.cpp
-    gameplay_foundations/engine/tree_traverser.hpp
+    gameplay_foundations/engine/node_pool.hpp
+    gameplay_foundations/engine/node_pool.cpp
 )
 
 target_include_directories(gameplay_foundations PUBLIC
@@ -36,10 +37,15 @@ target_include_directories(gameplay_foundations PUBLIC
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/engine
 )
 
-# Test executable
-add_executable(test_game
-    test/main.cpp
-    test/main-scene.cpp
+# Demo executable
+add_executable(demo_game
+    demo/main.cpp
+    demo/scenes/scene_manager.hpp
+    demo/scenes/scene_manager.cpp
+    demo/scenes/main_menu.hpp
+    demo/scenes/main_menu.cpp
+    demo/scenes/mini_game.hpp
+    demo/scenes/mini_game.cpp
 )
 
-target_link_libraries(test_game PRIVATE gameplay_foundations)
+target_link_libraries(demo_game PRIVATE gameplay_foundations)

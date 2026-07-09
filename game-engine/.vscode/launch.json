@@ -2,19 +2,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug Game",
+            "name": "Debug Demo Game",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/test_game",
+            "program": "${command:cmake.launchTargetPath}",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
-
-            "MIMode": "gdb",
-            "miDebuggerPath": "/usr/bin/gdb",
-
-            "preLaunchTask": "build",
-
+            "preLaunchTask": "CMake: build",
             "setupCommands": [
                 {
                     "description": "Enable pretty printing",
