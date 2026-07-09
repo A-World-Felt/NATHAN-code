@@ -20,7 +20,7 @@ Before you start, make sure you have the following installed:
 
 On **Linux** (Debian/Ubuntu):
 ```bash
-sudo apt install cmake g++ make gdb
+sudo apt install cmake gcc make gdb
 ```
 
 On **macOS** (with Homebrew):
@@ -28,7 +28,13 @@ On **macOS** (with Homebrew):
 brew install cmake make gdb
 ```
 
-On **Windows**: Should work with **MinGW** or **MSYS2** (not officially tested yet).
+On **Windows**: 
+Install cmake and chocolatey
+with chocolatey:
+```bash
+choco install mingw
+choco install make
+```
 
 ## Quick Start
 
