@@ -1,32 +1,39 @@
-#pragma once
+#ifndef GAME_ENGINE_EVENTS_CONNECTION_H_
+#define GAME_ENGINE_EVENTS_CONNECTION_H_
 
+#include <atomic>
 #include <cstdint>
 #include <functional>
-#include <atomic>
+
+namespace nathan {
 
 // Unique token for disconnecting event listeners
 class ConnectionToken {
-private:
-    uint64_t id;
-    void* emitter;
-    
-    static std::atomic<uint64_t> next_id;
-
 public:
-    ConnectionToken() : id(0), emitter(nullptr) {}
-    ConnectionToken(void* emitter) : id(next_id++), emitter(emitter) {}
+    ConnectionToken() : id_(0), emitter_(nullptr) {}
+    explicit ConnectionToken(void* emitter) : id_(get_next_id()), emitter_(emitter) {}
     
-    bool is_valid() const { return id != 0 && emitter != nullptr; }
-    uint64_t get_id() const { return id; }
-    void* get_emitter() const { return emitter; }
+    bool is_valid() const { return id_ != 0 && emitter_ != nullptr; }
+    uint64_t get_id() const { return id_; }
+    void* get_emitter() const { return emitter_; }
     
     bool operator==(const ConnectionToken& other) const {
-        return id == other.id && emitter == other.emitter;
+        return id_ == other.id_ && emitter_ == other.emitter_;
     }
     bool operator!=(const ConnectionToken& other) const {
         return !(*this == other);
     }
+
+private:
+    static uint64_t get_next_id() {
+        static std::atomic<uint64_t> next_id{1};
+        return next_id++;
+    }
+    
+    uint64_t id_;
+    void* emitter_;
 };
 
-// Initialize static member
-inline std::atomic<uint64_t> ConnectionToken::next_id{1};
+}  // namespace nathan
+
+#endif  // GAME_ENGINE_EVENTS_CONNECTION_H_

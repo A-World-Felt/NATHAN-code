@@ -1,12 +1,16 @@
-#pragma once
+#ifndef GAME_ENGINE_EVENTS_EVENT_EMITTER_H_
+#define GAME_ENGINE_EVENTS_EVENT_EMITTER_H_
 
-#include "connection.hpp"
-#include <string>
-#include <vector>
-#include <unordered_map>
+#include "events/connection.hpp"
+
 #include <functional>
 #include <memory>
 #include <mutex>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+namespace nathan {
 
 // Forward declaration
 class Node;
@@ -128,3 +132,7 @@ private:
         );
     }
 };
+
+}  // namespace nathan
+
+#endif  // GAME_ENGINE_EVENTS_EVENT_EMITTER_H_

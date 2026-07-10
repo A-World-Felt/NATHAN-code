@@ -3,7 +3,7 @@
 
 int main() {
     // Engine is a singleton - use Engine::instance()
-    Engine::instance().set_root(std::make_unique<SceneManager>());
-    Engine::instance().run();
+    nathan::Engine::instance().set_root(std::make_unique<nathan::SceneManager>());
+    nathan::Engine::instance().run();
     return 0;
 }

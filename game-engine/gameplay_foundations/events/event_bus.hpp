@@ -1,7 +1,11 @@
-#pragma once
+#ifndef GAME_ENGINE_EVENTS_EVENT_BUS_H_
+#define GAME_ENGINE_EVENTS_EVENT_BUS_H_
 
-#include "event_emitter.hpp"
+#include "events/event_emitter.hpp"
+
 #include <memory>
+
+namespace nathan {
 
 // Global event bus - singleton for global events (not hierarchical)
 class EventBus : public EventEmitter {
@@ -28,3 +32,7 @@ private:
     EventBus(const EventBus&) = delete;
     EventBus& operator=(const EventBus&) = delete;
 };
+
+}  // namespace nathan
+
+#endif  // GAME_ENGINE_EVENTS_EVENT_BUS_H_

@@ -1,7 +1,9 @@
-#pragma once
+#ifndef GAME_ENGINE_ENGINE_ENGINE_H_
+#define GAME_ENGINE_ENGINE_ENGINE_H_
 
-#include <memory>
-#include "node_pool.hpp"
+#include "engine/node_pool.hpp"
+
+namespace nathan {
 
 // Forward declaration
 class Node;
@@ -23,7 +25,7 @@ public:
     void stop();
     
     // Get current root
-    Node* get_root() const { return root; }
+    Node* get_root() const { return root_; }
     
     // Access to NodePool
     NodePool& get_node_pool() { return node_pool_; }
@@ -33,8 +35,12 @@ private:
     // Private constructor - use instance() to get the Engine
     Engine();
     
-    Node* root = nullptr;  // Raw pointer - owned by node_pool_
+    Node* root_ = nullptr;  // Raw pointer - owned by node_pool_
     NodePool node_pool_;  // Owns all nodes
-    bool running = true;
+    bool running_ = true;
     
 };
+
+}  // namespace nathan
+
+#endif  // GAME_ENGINE_ENGINE_ENGINE_H_

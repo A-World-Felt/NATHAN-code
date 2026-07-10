@@ -1,12 +1,14 @@
-#include "engine.hpp"
-#include "node_pool.hpp"
-#include "../node/node.hpp"
+#include "engine/engine.hpp"
+#include "engine/node_pool.hpp"
+#include "node/node.hpp"
 
 #include <chrono>
 #include <iostream>
 #include <thread>
 
-Engine::Engine() : root(nullptr), running(true) {
+namespace nathan {
+
+Engine::Engine() : root_(nullptr), running_(true) {
     // NodePool is initialized as a member
 }
 
@@ -16,7 +18,7 @@ Engine& Engine::instance() {
 }
 
 void Engine::set_root(std::unique_ptr<Node> scene) {
-    root = scene.get();
+    root_ = scene.get();
     if (scene) {
         node_pool_.create(std::move(scene));
         // setup() is called automatically by NodePool::create()
@@ -24,11 +26,11 @@ void Engine::set_root(std::unique_ptr<Node> scene) {
 }
 
 void Engine::stop() {
-    running = false;
+    running_ = false;
 }
 
 void Engine::run() {
-    if (!root) return;
+    if (!root_) return;
 
     std::cout << "[Engine] Starting game loop...\n";
 
@@ -39,7 +41,7 @@ void Engine::run() {
 
     auto previous = clock::now();
 
-    while (running) {
+    while (running_) {
         auto now = clock::now();
         float frame_time =
             std::chrono::duration<float>(now - previous).count();
@@ -59,7 +61,7 @@ void Engine::run() {
         while (accumulator >= fixed_dt) {
             // Loop through all active nodes
             for (auto& node_ptr : node_pool_.get_pool()) {
-                if (!node_ptr->destroyed) {
+                if (!node_ptr->is_destroyed()) {
                     node_ptr->loop(fixed_dt);
                 }
             }
@@ -70,3 +72,5 @@ void Engine::run() {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }
+
+}  // namespace nathan

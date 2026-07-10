@@ -1,6 +1,8 @@
-#include "node_pool.hpp"
-#include "../node/node.hpp"
-#include "../node/event_node.hpp"  // For EventNode disconnect
+#include "engine/node_pool.hpp"
+#include "node/event_node.hpp"
+#include "node/node.hpp"
+
+namespace nathan {
 
 Node* NodePool::create(std::unique_ptr<Node> node) {
     if (!node) {
@@ -13,20 +15,20 @@ Node* NodePool::create(std::unique_ptr<Node> node) {
 }
 
 void NodePool::destroy(Node* node) {
-    if (node && !node->destroyed) {
+    if (node && !node->is_destroyed()) {
         // Disconnect event subscriptions first to prevent dangling callbacks
         if (auto* event_node = dynamic_cast<EventNode*>(node)) {
             event_node->off_all();
         }
         
         // Recursively destroy all children first (depth-first)
-        std::vector<Node*> children_copy(node->children);
+        std::vector<Node*> children_copy(node->get_children());
         for (Node* child : children_copy) {
             destroy(child);
         }
         
         node->cleanup();      // Call cleanup before marking as destroyed
-        node->destroyed = true;
+        node->set_destroyed(true);
     }
 }
 
@@ -39,7 +41,7 @@ void NodePool::cleanup_destroyed() {
     node_pool_.erase(
         std::remove_if(node_pool_.begin(), node_pool_.end(),
             [](const std::unique_ptr<Node>& ptr) {
-                return ptr->destroyed;
+                return ptr->is_destroyed();
             }),
         node_pool_.end()
     );
@@ -60,3 +62,5 @@ bool NodePool::contains(Node* node) const {
     }
     return false;
 }
+
+}  // namespace nathan

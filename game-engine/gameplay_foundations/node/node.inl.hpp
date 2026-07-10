@@ -1,11 +1,12 @@
-#pragma once
+#ifndef GAME_ENGINE_NODE_NODE_INL_H_
+#define GAME_ENGINE_NODE_NODE_INL_H_
 
 #include <algorithm>
-#include <iostream>
 #include <memory>
-#include "../engine/engine.hpp"
 
-// Inline implementations for Node
+#include "engine/engine.hpp"
+
+namespace nathan {
 
 inline void Node::setup() {
     // Default: do nothing
@@ -22,25 +23,29 @@ inline void Node::cleanup() {
 // Tree modification - uses singleton Engine
 inline void Node::add_child(std::unique_ptr<Node> child) {
     Node* raw = child.get();
-    raw->parent = this;
-    children.push_back(raw);
+    raw->parent_ = this;
+    children_.push_back(raw);
     Engine::instance().get_node_pool().create(std::move(child));
     // Note: setup() is called automatically by NodePool::create()
 }
 
 inline void Node::remove_child(Node* child) {
-    auto it = std::find(children.begin(), children.end(), child);
-    if (it != children.end()) {
-        child->parent = nullptr;
+    auto it = std::find(children_.begin(), children_.end(), child);
+    if (it != children_.end()) {
+        child->parent_ = nullptr;
         Engine::instance().get_node_pool().destroy(child);
-        children.erase(it);
+        children_.erase(it);
     }
 }
 
 inline void Node::destroy() {
-    if (parent) {
-        parent->remove_child(this);
+    if (parent_) {
+        parent_->remove_child(this);
     } else {
         Engine::instance().get_node_pool().destroy(this);
     }
 }
+
+}  // namespace nathan
+
+#endif  // GAME_ENGINE_NODE_NODE_INL_H_
