@@ -22,6 +22,8 @@ add_library(gameplay_foundations
     gameplay_foundations/node/node.hpp
     gameplay_foundations/node/node.inl.hpp
     gameplay_foundations/node/event_node.hpp
+    gameplay_foundations/node/scene_manager.hpp
+    gameplay_foundations/node/scene_manager.cpp
     
     # Engine
     gameplay_foundations/engine/engine.hpp

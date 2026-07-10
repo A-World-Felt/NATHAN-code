@@ -132,7 +132,7 @@ void MiniGame::loop(float delta) {
     if (timer_ >= 5.0f) {
         std::cout << "[MiniGame] User clicked 'Quit'\n";
         if (get_parent()) {
-            if (auto* manager = dynamic_cast<SceneManager*>(get_parent())) {
+            if (auto* manager = dynamic_cast<DemoSceneManager*>(get_parent())) {
                 manager->return_to_main();
             }
         }
