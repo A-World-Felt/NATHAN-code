@@ -5,5 +5,11 @@
   "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
   "C_Cpp.codeAnalysis.clangTidy.checks.disabled": [
     "clang-diagnostic-error"
-  ]
+  ],
+  "c-cpp-flylint.flexelint.enable": false,
+  "c-cpp-flylint.flawfinder.enable": false,
+  "c-cpp-flylint.lizard.enable": false,
+  "c-cpp-flylint.clang.enable": false,
+  "cmake.ctest.neverDebugTestsWithLaunchConfiguration": true,
+  "cmake.ctest.testExplorerIntegrationEnabled": false,
 }

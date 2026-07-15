@@ -1,1 +1,3 @@
 build/
+tests/coverage.info
+tests/coverage_html/
