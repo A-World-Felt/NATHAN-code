@@ -37,7 +37,12 @@ target_include_directories(gameplay_foundations PUBLIC
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/node
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/events
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/engine
+    ${CMAKE_SOURCE_DIR}/vendor/SDL/include
 )
+
+add_subdirectory(vendor/SDL EXCLUDE_FROM_ALL)
+
+target_link_libraries(gameplay_foundations PRIVATE SDL3::SDL3)
 
 # Demo executable
 add_executable(demo_game
