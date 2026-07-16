@@ -30,6 +30,10 @@ add_library(gameplay_foundations
     gameplay_foundations/engine/engine.cpp
     gameplay_foundations/engine/node_pool.hpp
     gameplay_foundations/engine/node_pool.cpp
+        gameplay_foundations/inputs/iinput_device.hpp
+        gameplay_foundations/inputs/SDL/sdl_input_device.cpp
+        gameplay_foundations/inputs/SDL/sdl_input_device.hpp
+        gameplay_foundations/inputs/input_types.h
 )
 
 target_include_directories(gameplay_foundations PUBLIC

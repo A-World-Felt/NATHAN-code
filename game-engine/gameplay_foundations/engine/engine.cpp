@@ -6,10 +6,13 @@
 #include <iostream>
 #include <thread>
 
+#include "inputs/SDL/sdl_input_device.hpp"
+
 namespace nathan {
 
 Engine::Engine() : root_(nullptr), running_(true) {
     // NodePool is initialized as a member
+    // input_device_ = new SDLInputDevice;
 }
 
 Engine& Engine::instance() {
@@ -56,6 +59,9 @@ void Engine::run() {
 
         // Process destroyed nodes BEFORE traversal
         node_pool_.cleanup_destroyed();
+
+        // Input events update
+        // input_device_->update();
 
         // FIXED UPDATE LOOP - iterate all nodes in pool
         while (accumulator >= fixed_dt) {
