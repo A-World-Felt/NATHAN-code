@@ -30,10 +30,10 @@ add_library(gameplay_foundations
     gameplay_foundations/engine/engine.cpp
     gameplay_foundations/engine/node_pool.hpp
     gameplay_foundations/engine/node_pool.cpp
-        gameplay_foundations/inputs/iinput_device.hpp
-        gameplay_foundations/inputs/SDL/sdl_input_device.cpp
-        gameplay_foundations/inputs/SDL/sdl_input_device.hpp
-        gameplay_foundations/inputs/input_types.h
+    gameplay_foundations/inputs/iinput_device.hpp
+    gameplay_foundations/inputs/sdl/sdl_input_device.cpp
+    gameplay_foundations/inputs/sdl/sdl_input_device.hpp
+    gameplay_foundations/inputs/input_types.h
 )
 
 target_include_directories(gameplay_foundations PUBLIC
@@ -41,7 +41,7 @@ target_include_directories(gameplay_foundations PUBLIC
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/node
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/events
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/engine
-    ${CMAKE_SOURCE_DIR}/vendor/SDL/include
+    ${CMAKE_SOURCE_DIR}/vendor/sdl/include
 )
 
 add_subdirectory(vendor/SDL EXCLUDE_FROM_ALL)
@@ -58,5 +58,14 @@ add_executable(demo_game
     demo/scenes/mini_game.hpp
     demo/scenes/mini_game.cpp
 )
+
+if(WIN32)
+    add_custom_command(TARGET demo_game POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_RUNTIME_DLLS:demo_game>
+        $<TARGET_FILE_DIR:demo_game>
+        COMMAND_EXPAND_LISTS
+    )
+endif()
 
 target_link_libraries(demo_game PRIVATE gameplay_foundations)
