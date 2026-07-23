@@ -1,6 +1,7 @@
-// Unit tests for NodePool using Google Test
+// Unit tests for NodePool using Google Test and Google Mock
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <memory>
 
 #include "gameplay_foundations/engine/node_pool.hpp"
@@ -8,28 +9,18 @@
 
 namespace nathan {
 
-class TrackedNode : public Node {
+class MockNode : public Node {
 public:
-    bool setup_called = false;
-    bool cleanup_called = false;
-
-    void setup() override { setup_called = true; }
-    void cleanup() override { cleanup_called = true; }
+    using Node::Node;  // Inherit constructors
+    
+    MOCK_METHOD(void, setup, (), (override));
+    MOCK_METHOD(void, loop, (float delta), (override));
+    MOCK_METHOD(void, cleanup, (), (override));
 };
 
-class ChildTrackedNode : public TrackedNode {
+class MockChildNode : public MockNode {
 public:
-    bool child_setup_called = false;
-    bool child_cleanup_called = false;
-
-    void setup() override {
-        TrackedNode::setup();
-        child_setup_called = true;
-    }
-    void cleanup() override {
-        TrackedNode::cleanup();
-        child_cleanup_called = true;
-    }
+    using MockNode::MockNode;
 };
 
 } // namespace nathan
@@ -47,27 +38,37 @@ TEST(NodePoolTest, CreateAddsNodeToPool) {
 
 TEST(NodePoolTest, CreateCallsSetupOnNode) {
     nathan::NodePool pool;
-    auto tracked_node = std::make_unique<nathan::TrackedNode>();
+    auto mock_node = std::make_unique<nathan::MockNode>();
 
-    nathan::Node* raw = pool.create(std::move(tracked_node));
+    // Get raw pointer to set expectations before moving
+    nathan::MockNode* raw_mock = mock_node.get();
+    // NodePool::create will call setup()
+    EXPECT_CALL(*raw_mock, setup()).Times(1);
+
+    nathan::Node* raw = pool.create(std::move(mock_node));
 
     ASSERT_NE(raw, nullptr);
-    nathan::TrackedNode* tracked = dynamic_cast<nathan::TrackedNode*>(raw);
-    ASSERT_NE(tracked, nullptr);
-    EXPECT_TRUE(tracked->setup_called);
+    // Mock destructor verifies setup was called
 }
 
 TEST(NodePoolTest, DestroyCallsCleanupOnNode) {
     nathan::NodePool pool;
-    auto tracked_node = std::make_unique<nathan::TrackedNode>();
-    nathan::Node* raw = pool.create(std::move(tracked_node));
+    auto mock_node = std::make_unique<nathan::MockNode>();
+    
+    // Get raw pointer to set expectations before moving
+    nathan::MockNode* raw_mock = mock_node.get();
+    // NodePool::create calls setup()
+    EXPECT_CALL(*raw_mock, setup()).Times(1);
+    
+    nathan::Node* raw = pool.create(std::move(mock_node));
+
+    // Expect cleanup to be called exactly once
+    EXPECT_CALL(*raw_mock, cleanup()).Times(1);
 
     pool.destroy(raw);
 
-    nathan::TrackedNode* tracked = dynamic_cast<nathan::TrackedNode*>(raw);
-    ASSERT_NE(tracked, nullptr);
-    EXPECT_TRUE(tracked->cleanup_called);
     EXPECT_TRUE(raw->is_destroyed());
+    // Mock destructor verifies both setup and cleanup were called
 }
 
 TEST(NodePoolTest, CleanupDestroyedRemovesDestroyedNodes) {
@@ -100,13 +101,20 @@ TEST(NodePoolTest, CleanupDestroyedPreservesActiveNodes) {
 
 TEST(NodePoolTest, QueueRemoveIsAliasForDestroy) {
     nathan::NodePool pool;
-    auto tracked_node = std::make_unique<nathan::TrackedNode>();
-    nathan::Node* raw = pool.create(std::move(tracked_node));
+    auto mock_node = std::make_unique<nathan::MockNode>();
+    
+    // Get raw pointer to set expectations before moving
+    nathan::MockNode* raw_mock = mock_node.get();
+    // NodePool::create calls setup()
+    EXPECT_CALL(*raw_mock, setup()).Times(1);
+    
+    nathan::Node* raw = pool.create(std::move(mock_node));
+
+    // Expect cleanup to be called exactly once
+    EXPECT_CALL(*raw_mock, cleanup()).Times(1);
 
     pool.queue_remove(raw);
 
-    nathan::TrackedNode* tracked = dynamic_cast<nathan::TrackedNode*>(raw);
-    ASSERT_NE(tracked, nullptr);
-    EXPECT_TRUE(tracked->cleanup_called);
     EXPECT_TRUE(raw->is_destroyed());
+    // Mock destructor verifies both setup and cleanup were called
 }

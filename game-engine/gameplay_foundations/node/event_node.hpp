@@ -9,8 +9,6 @@ namespace nathan {
 // Node with event capabilities
 class EventNode : public Node, public EventEmitter {
 public:
-    using Node::Node;
-    
     // Emit event that bubbles up to parent
     template<typename T>
     void emit(std::string event_type, const T& data) {

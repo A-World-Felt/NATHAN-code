@@ -12,14 +12,11 @@ Engine::Engine() : root_(nullptr), running_(true) {
     // NodePool is initialized as a member
 }
 
-Engine& Engine::instance() {
-    static Engine instance;  // Meyer's singleton
-    return instance;
-}
-
 void Engine::set_root(std::unique_ptr<Node> scene) {
     root_ = scene.get();
     if (scene) {
+        // Set engine on root node before adding to pool
+        scene->set_engine(this);
         node_pool_.create(std::move(scene));
         // setup() is called automatically by NodePool::create()
     }

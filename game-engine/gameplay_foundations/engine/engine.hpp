@@ -2,13 +2,14 @@
 #define GAME_ENGINE_ENGINE_ENGINE_H_
 
 #include "engine/node_pool.hpp"
+#include "events/event_bus.hpp"
 
 namespace nathan {
 
 // Forward declaration
 class Node;
 
-// Engine is a singleton - only one instance exists
+// Engine manages the game world and its subsystems
 class Engine {
 public:
     // Delete copy/move constructors and assignment
@@ -17,8 +18,8 @@ public:
     Engine(Engine&&) = delete;
     Engine& operator=(Engine&&) = delete;
     
-    // Get the singleton instance
-    static Engine& instance();
+    // Regular constructor - Engine uses dependency injection, not singleton
+    Engine();
     
     void set_root(std::unique_ptr<Node> scene);
     void run();
@@ -31,12 +32,14 @@ public:
     NodePool& get_node_pool() { return node_pool_; }
     const NodePool& get_node_pool() const { return node_pool_; }
 
+    // Access to EventBus
+    EventBus& get_event_bus() { return event_bus_; }
+    const EventBus& get_event_bus() const { return event_bus_; }
+
 private:
-    // Private constructor - use instance() to get the Engine
-    Engine();
-    
     Node* root_ = nullptr;  // Raw pointer - owned by node_pool_
     NodePool node_pool_;  // Owns all nodes
+    EventBus event_bus_;   // Owns the event bus
     bool running_ = true;
     
 };

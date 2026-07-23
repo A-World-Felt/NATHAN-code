@@ -13,18 +13,16 @@ struct GlobalTestEvent {
 
 } // namespace nathan
 
-TEST(EventBusTest, GlobalReturnsSingleton) {
-    nathan::EventBus& bus1 = nathan::EventBus::global();
-    nathan::EventBus& bus2 = nathan::EventBus::global();
+TEST(EventBusTest, CreateInstance) {
+    nathan::EventBus bus1;
+    nathan::EventBus bus2;
     
-    EXPECT_EQ(&bus1, &bus2);
+    // Different instances should be different objects
+    EXPECT_NE(&bus1, &bus2);
 }
 
 TEST(EventBusTest, EmitGlobalAndOnGlobal) {
-    nathan::EventBus& bus = nathan::EventBus::global();
-    
-    // Clear any existing subscriptions
-    bus.off_all();
+    nathan::EventBus bus;
     
     bool called = false;
     int received_value = 0;
@@ -44,16 +42,10 @@ TEST(EventBusTest, EmitGlobalAndOnGlobal) {
     
     EXPECT_TRUE(called);
     EXPECT_EQ(received_value, 123);
-    
-    // Clean up
-    bus.off_all();
 }
 
-TEST(EventBusTest, GlobalIsAccessibleFromAnywhere) {
-    nathan::EventBus& bus = nathan::EventBus::global();
-    
-    // Clear any existing subscriptions
-    bus.off_all();
+TEST(EventBusTest, InstanceIsAccessibleAndWorks) {
+    nathan::EventBus bus;
     
     bool called1 = false;
     
@@ -62,23 +54,14 @@ TEST(EventBusTest, GlobalIsAccessibleFromAnywhere) {
         [&](const nathan::GlobalTestEvent&) { called1 = true; }
     );
     
-    // Second access
-    nathan::EventBus& bus2 = nathan::EventBus::global();
     nathan::GlobalTestEvent event{0};
-    bus2.emit_global<nathan::GlobalTestEvent>("test_global", event);
+    bus.emit_global<nathan::GlobalTestEvent>("test_global", event);
     
     EXPECT_TRUE(called1);
-    EXPECT_EQ(&bus, &bus2);
-    
-    // Clean up
-    bus.off_all();
 }
 
 TEST(EventBusTest, MultipleGlobalSubscriptions) {
-    nathan::EventBus& bus = nathan::EventBus::global();
-    
-    // Clear any existing subscriptions
-    bus.off_all();
+    nathan::EventBus bus;
     
     int call_count = 0;
     
@@ -96,16 +79,10 @@ TEST(EventBusTest, MultipleGlobalSubscriptions) {
     bus.emit_global<nathan::GlobalTestEvent>("test_event", event);
     
     EXPECT_EQ(call_count, 2);
-    
-    // Clean up
-    bus.off_all();
 }
 
 TEST(EventBusTest, OffAllClearsAllGlobalSubscriptions) {
-    nathan::EventBus& bus = nathan::EventBus::global();
-    
-    // Clear any existing subscriptions first
-    bus.off_all();
+    nathan::EventBus bus;
     
     int call_count = 0;
     

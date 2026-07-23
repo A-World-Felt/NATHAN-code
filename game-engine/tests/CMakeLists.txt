@@ -26,7 +26,6 @@ target_link_libraries(game_engine_tests
     gtest
     gtest_main
     gmock
-    pthread
 )
 
 # Enable coverage for our test code

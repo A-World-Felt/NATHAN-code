@@ -2,8 +2,10 @@
 #include "scenes/scene_manager.hpp"
 
 int main() {
-    // Engine is a singleton - use Engine::instance()
-    nathan::Engine::instance().set_root(std::make_unique<nathan::DemoSceneManager>());
-    nathan::Engine::instance().run();
+    // Create Engine instance (no longer a singleton)
+    nathan::Engine engine;
+    engine.set_root(std::make_unique<nathan::DemoSceneManager>());
+    
+    engine.run();
     return 0;
 }

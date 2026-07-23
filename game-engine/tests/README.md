@@ -41,8 +41,6 @@ tests/unit/gameplay_foundations/
     └── event_emitter_test.cpp
 ```
 
-**55 tests across 9 files**
-
 ## Writing Tests
 
 ### Create a New Test File
@@ -51,7 +49,7 @@ tests/unit/gameplay_foundations/
 
 ```cpp
 #include <gtest/gtest.h>
-#include "gameplay_foundations/your_module/your_header.hpp"
+#include "your_module/your_header.hpp"
 
 TEST(ModuleTest, TestName) {
     // Arrange
@@ -69,7 +67,7 @@ TEST(ModuleTest, TestName) {
 ### Example: Testing Node
 ```cpp
 #include <gtest/gtest.h>
-#include "gameplay_foundations/node/node.hpp"
+#include "node/node.hpp"
 
 TEST(NodeTest, NameAccessors) {
     nathan::Node node;

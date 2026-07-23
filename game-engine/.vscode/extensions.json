@@ -1,7 +1,5 @@
 {
     "recommendations": [
-        "ms-vscode.cpptools-extension-pack",
-        "jbenden.c-cpp-flylint",
-        "matepek.vscode-catch2-test-adapter"
+        "ms-vscode.cpptools-extension-pack"
     ]
 }

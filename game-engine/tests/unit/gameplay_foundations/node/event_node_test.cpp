@@ -17,13 +17,13 @@ struct AnotherTestEvent {
     std::string message;
 };
 
-class TestEventNode : public EventNode {
+class MockEventNode : public EventNode {
 public:
-    bool setup_called = false;
-    bool cleanup_called = false;
+    using EventNode::EventNode;  // Inherit constructors
     
-    void setup() override { setup_called = true; }
-    void cleanup() override { cleanup_called = true; }
+    MOCK_METHOD(void, setup, (), (override));
+    MOCK_METHOD(void, loop, (float delta), (override));
+    MOCK_METHOD(void, cleanup, (), (override));
 };
 
 } // namespace nathan
@@ -37,13 +37,13 @@ TEST(EventNodeTest, DefaultConstruction) {
 }
 
 TEST(EventNodeTest, Lifecycle) {
-    nathan::TestEventNode node;
+    nathan::MockEventNode mock_node;
     
-    node.setup();
-    EXPECT_TRUE(node.setup_called);
+    EXPECT_CALL(mock_node, setup()).Times(1);
+    EXPECT_CALL(mock_node, cleanup()).Times(1);
     
-    node.cleanup();
-    EXPECT_TRUE(node.cleanup_called);
+    mock_node.setup();
+    mock_node.cleanup();
 }
 
 TEST(EventNodeTest, InheritsNodeFunctionality) {
