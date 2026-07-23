@@ -16,7 +16,7 @@ SDLInputDevice::SDLInputDevice() {
     SDL_JoystickID* devices = SDL_GetGamepads(&count);
     for (int i = 0; i < count; i++) {
         SDL_Gamepad* gamepad = SDL_OpenGamepad(devices[i]);
-        // SDL_Log("%s", SDL_GetGamepadName(gamepad));
+        SDL_Log("%s", SDL_GetGamepadName(gamepad));
         gamepads_.push_back(gamepad);
     }
     SDL_free(devices);
@@ -57,8 +57,6 @@ int16_t SDLInputDevice::get_axis_value(gamepad_axis ga) {
 }
 
 void SDLInputDevice::handle_event(const SDL_Event &event) {
-    // char event_buffer[256];
-    // SDL_GetEventDescription(&event, event_buffer, sizeof(event_buffer));
     if (event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN) {
         current_button_.at(static_cast<uint8_t>(to_engine(static_cast<SDL_GamepadButton>(event.gbutton.button)))) = true;
     }
@@ -66,7 +64,6 @@ void SDLInputDevice::handle_event(const SDL_Event &event) {
         current_button_.at(static_cast<uint8_t>(to_engine(static_cast<SDL_GamepadButton>(event.gbutton.button)))) = false;
     }
     else if (event.type == SDL_EVENT_GAMEPAD_AXIS_MOTION) {
-        // SDL_Log("SDL_GetEventDescription: %s", event_buffer);
         axis_.at(static_cast<uint8_t>(to_engine(static_cast<SDL_GamepadAxis>(event.gaxis.axis)))) = event.gaxis.value;
     }
 }
