@@ -30,6 +30,9 @@ add_library(gameplay_foundations
     gameplay_foundations/engine/engine.cpp
     gameplay_foundations/engine/node_pool.hpp
     gameplay_foundations/engine/node_pool.cpp
+
+    # Audio
+    gameplay_foundations/audio/sound.hpp
 )
 
 target_include_directories(gameplay_foundations PUBLIC
