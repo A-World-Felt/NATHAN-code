@@ -18,16 +18,17 @@ public:
 
     bool is_button_pressed(gamepad_button) override;
     bool is_button_released(gamepad_button) override;
+    int16_t get_axis_value(gamepad_axis) override;
 
     void handle_event(const SDL_Event &event);
 private:
-    static SDL_GamepadButton to_sdl(gamepad_button gb);
     static gamepad_button to_engine(SDL_GamepadButton sdl_gb);
-    static gamepad_button to_engine(Uint8 sdl_gb);
+    static gamepad_axis to_engine(SDL_GamepadAxis sdl_ga);
 
     std::vector<SDL_Gamepad*> gamepads_;
     std::array<bool, static_cast<size_t>(gamepad_button::count)> current_button_{};
     std::array<bool, static_cast<size_t>(gamepad_button::count)> previous_button_{};
+    std::array<int16_t, static_cast<size_t>(gamepad_axis::count)> axis_{};
 };
 
 } // sdl

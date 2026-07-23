@@ -11,9 +11,13 @@ void MainMenu::setup() {
 }
 
 void MainMenu::loop(float delta) {
+    // Input test
     if (Engine::instance().get_input_device()->is_button_pressed(gamepad_button::left_face_button)) {
         std::cout << "Button pressed\n";
     }
+
+    std::cout << Engine::instance().get_input_device()->get_axis_value(gamepad_axis::x_left_joystick) << std::endl;
+
     // static float timer = 0.0f;
     // timer += delta;
     //

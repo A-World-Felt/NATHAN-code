@@ -23,10 +23,15 @@ enum class gamepad_button {
     count
 };
 
-template<typename T>
-struct vector2 {
-    T x;
-    T y;
+enum class gamepad_axis {
+    invalid_axis = -1,
+    x_left_joystick,
+    y_left_joystick,
+    x_right_joystick,
+    y_right_joystick,
+    left_trigger,
+    right_trigger,
+    count
 };
 
 #endif //MYGAMEENGINE_INPUT_TYPES_H

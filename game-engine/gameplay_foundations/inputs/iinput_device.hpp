@@ -13,6 +13,7 @@ public:
 
     virtual bool is_button_pressed(gamepad_button) = 0;
     virtual bool is_button_released(gamepad_button) = 0;
+    virtual int16_t get_axis_value(gamepad_axis) = 0;
 };
 
 }
