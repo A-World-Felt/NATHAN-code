@@ -18,7 +18,6 @@ public:
     Engine(Engine&&) = delete;
     Engine& operator=(Engine&&) = delete;
     
-    // Regular constructor - Engine uses dependency injection, not singleton
     Engine();
     
     void set_root(std::unique_ptr<Node> scene);

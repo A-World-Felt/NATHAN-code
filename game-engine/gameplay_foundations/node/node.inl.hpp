@@ -8,19 +8,12 @@
 
 namespace nathan {
 
-inline void Node::setup() {
-    // Default: do nothing
-}
+inline void Node::setup() {}
 
-inline void Node::loop(float delta) {
-    // Default: do nothing
-}
+inline void Node::loop(float delta) {}
 
-inline void Node::cleanup() {
-    // Default: do nothing
-}
+inline void Node::cleanup() {}
 
-// Tree modification - uses Engine's NodePool
 inline void Node::add_child(std::unique_ptr<Node> child) {
     Node* raw = child.get();
     raw->parent_ = this;
@@ -30,7 +23,7 @@ inline void Node::add_child(std::unique_ptr<Node> child) {
         engine_->get_node_pool().create(std::move(child));
     }
     // Note: setup() is called automatically by NodePool::create()
-}
+    }
 
 inline void Node::remove_child(Node* child) {
     auto it = std::find(children_.begin(), children_.end(), child);

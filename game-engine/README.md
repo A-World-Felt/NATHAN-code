@@ -155,7 +155,7 @@ int main() {
 ## Key Concepts
 
 ### Engine
-The central manager. **Not a singleton** - create an instance per game. Each Engine owns a `NodePool` (manages all nodes) and an `EventBus` (global event handling).
+The central manager. Create an instance per game. Each Engine owns a `NodePool` (manages all nodes) and an `EventBus` (global event handling).
 
 ### Scenes
 Your game is organized into **scenes** - different screens like main menus, gameplay levels, etc. Switch between them using `SceneManager`.

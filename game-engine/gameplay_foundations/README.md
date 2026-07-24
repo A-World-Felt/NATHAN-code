@@ -6,7 +6,7 @@ The core systems of the game engine: **Engine**, **NodePool**, and **Node** hier
 
 ### Engine
 
-The central manager. Uses dependency injection - **not a singleton**. Create an instance per game.
+The central manager. Uses dependency injection. Create an instance per game.
 
 ```cpp
 // Create an engine instance

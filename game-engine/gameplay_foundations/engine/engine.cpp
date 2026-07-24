@@ -8,9 +8,7 @@
 
 namespace nathan {
 
-Engine::Engine() : root_(nullptr), running_(true) {
-    // NodePool is initialized as a member
-}
+Engine::Engine() : root_(nullptr), running_(true) {}
 
 void Engine::set_root(std::unique_ptr<Node> scene) {
     root_ = scene.get();
@@ -54,7 +52,7 @@ void Engine::run() {
         // Process destroyed nodes BEFORE traversal
         node_pool_.cleanup_destroyed();
 
-        // FIXED UPDATE LOOP - iterate all nodes in pool
+        // UPDATE LOOP - iterate all nodes in pool
         while (accumulator >= fixed_dt) {
             // Loop through all active nodes
             for (auto& node_ptr : node_pool_.get_pool()) {

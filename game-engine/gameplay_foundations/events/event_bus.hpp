@@ -7,7 +7,7 @@
 
 namespace nathan {
 
-// Global event bus - now supports dependency injection (no longer a singleton)
+// Global event bus
 class EventBus : public EventEmitter {
 public:
     EventBus() = default;

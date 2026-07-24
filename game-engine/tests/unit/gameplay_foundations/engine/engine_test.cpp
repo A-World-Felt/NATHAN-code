@@ -21,8 +21,6 @@ public:
 
 } // namespace nathan
 
-// Singleton test removed - Engine now uses dependency injection only
-
 TEST(EngineTest, SetRootSetsRootAndAddsToPool) {
     nathan::Engine engine;
     
