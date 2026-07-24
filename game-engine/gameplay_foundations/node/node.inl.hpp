@@ -23,7 +23,7 @@ inline void Node::add_child(std::unique_ptr<Node> child) {
         engine_->get_node_pool().create(std::move(child));
     }
     // Note: setup() is called automatically by NodePool::create()
-    }
+}
 
 inline void Node::remove_child(Node* child) {
     auto it = std::find(children_.begin(), children_.end(), child);
