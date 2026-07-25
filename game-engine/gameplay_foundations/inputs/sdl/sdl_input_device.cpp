@@ -6,7 +6,7 @@
 
 namespace nathan {
 
-SDLInputDevice::SDLInputDevice() {
+SDLInputDevice::SDLInputDevice(EventBus& event_bus) : IInputDevice(event_bus) {
     if (!SDL_Init(SDL_INIT_GAMEPAD)) {
         SDL_Log("SDL_Init failed: %s", SDL_GetError());
         exit(-1);
@@ -14,9 +14,9 @@ SDLInputDevice::SDLInputDevice() {
     SDL_Log("SDL_Init successfully");
 
     int count = 0;
-    SDL_JoystickID* devices = SDL_GetGamepads(&count);
+    SDL_JoystickID *devices = SDL_GetGamepads(&count);
     for (int i = 0; i < count; i++) {
-        SDL_Gamepad* gamepad = SDL_OpenGamepad(devices[i]);
+        SDL_Gamepad *gamepad = SDL_OpenGamepad(devices[i]);
         SDL_Log("%s", SDL_GetGamepadName(gamepad));
         gamepads_.push_back(gamepad);
     }
@@ -59,13 +59,25 @@ int16_t SDLInputDevice::get_axis_value(GamepadAxis ga) {
 
 void SDLInputDevice::handle_event(const SDL_Event &event) {
     if (event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN) {
-        current_button_.at(static_cast<uint8_t>(to_engine(static_cast<SDL_GamepadButton>(event.gbutton.button)))) = true;
+        GamepadButton gamepad_button = to_engine(static_cast<SDL_GamepadButton>(event.gbutton.button));
+        event_bus_.emit_global<GamepadButton>(
+            "button_pressed", gamepad_button
+        );
+        current_button_.at(static_cast<uint8_t>(gamepad_button)) = true;
     }
     else if (event.type == SDL_EVENT_GAMEPAD_BUTTON_UP) {
-        current_button_.at(static_cast<uint8_t>(to_engine(static_cast<SDL_GamepadButton>(event.gbutton.button)))) = false;
+        GamepadButton gamepad_button = to_engine(static_cast<SDL_GamepadButton>(event.gbutton.button));
+        event_bus_.emit_global<GamepadButton>(
+            "button_released", gamepad_button
+        );
+        current_button_.at(static_cast<uint8_t>(gamepad_button)) = false;
     }
     else if (event.type == SDL_EVENT_GAMEPAD_AXIS_MOTION) {
-        axis_.at(static_cast<uint8_t>(to_engine(static_cast<SDL_GamepadAxis>(event.gaxis.axis)))) = event.gaxis.value;
+        GamepadAxis gamepad_axis = to_engine(static_cast<SDL_GamepadAxis>(event.gaxis.axis));
+        event_bus_.emit_global<GamepadAxis>(
+            "axis_value_changed", gamepad_axis
+        );
+        axis_.at(static_cast<uint8_t>(gamepad_axis)) = event.gaxis.value;
     }
 }
 

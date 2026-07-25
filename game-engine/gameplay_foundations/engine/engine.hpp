@@ -31,7 +31,7 @@ public:
     // Access to NodePool
     NodePool& get_node_pool() { return node_pool_; }
     const NodePool& get_node_pool() const { return node_pool_; }
-    IInputDevice* get_input_device() const { return input_device_; }
+    std::shared_ptr<IInputDevice> get_input_device() const { return input_device_; }
 
 private:
     // Private constructor - use instance() to get the Engine
@@ -39,7 +39,8 @@ private:
     
     Node* root_ = nullptr;  // Raw pointer - owned by node_pool_
     NodePool node_pool_;  // Owns all nodes
-    IInputDevice* input_device_ = nullptr;
+    EventBus event_bus_;
+    std::shared_ptr<IInputDevice> input_device_;
     bool running_ = true;
     
 };

@@ -11,7 +11,7 @@ namespace nathan {
 
 Engine::Engine() : root_(nullptr), running_(true) {
     // NodePool is initialized as a member
-    input_device_ = new SDLInputDevice;
+    input_device_ = std::make_shared<SDLInputDevice>(event_bus_);
 }
 
 Engine& Engine::instance() {

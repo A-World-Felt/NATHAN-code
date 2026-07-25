@@ -1,7 +1,7 @@
 #ifndef GAME_ENGINE_INPUTS_INPUT_TYPES_H_
 #define GAME_ENGINE_INPUTS_INPUT_TYPES_H_
 
-enum class GamepadButton {
+enum class GamepadButton : int8_t {
     kInvalidButton = -1,
     kTopFaceButton,
     kLeftFaceButton,
@@ -19,7 +19,7 @@ enum class GamepadButton {
     kCount
 };
 
-enum class GamepadAxis {
+enum class GamepadAxis : int8_t {
     kInvalidAxis = -1,
     kXLeftJoystickAxis,
     kYLeftJoystickAxis,

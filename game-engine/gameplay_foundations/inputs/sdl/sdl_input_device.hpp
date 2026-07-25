@@ -2,6 +2,7 @@
 #define GAME_ENGINE_INPUTS_SDL_INPUT_DEVICE_H_
 
 #include <array>
+#include <memory>
 #include <vector>
 #include <SDL3/SDL_events.h>
 #include "inputs/iinput_device.hpp"
@@ -11,7 +12,7 @@ namespace nathan {
 
 class SDLInputDevice : public IInputDevice {
 public:
-    SDLInputDevice();
+    explicit SDLInputDevice(EventBus& event_bus);
     void update() override;
 
     void new_frame() override;
