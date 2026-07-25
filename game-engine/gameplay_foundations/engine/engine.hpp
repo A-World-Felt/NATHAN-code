@@ -18,20 +18,19 @@ public:
     Engine& operator=(const Engine&) = delete;
     Engine(Engine&&) = delete;
     Engine& operator=(Engine&&) = delete;
-    
+
     Engine();
-    
+
     void set_root(std::unique_ptr<Node> scene);
     void run();
     void stop();
-    
+
     // Get current root
     Node* get_root() const { return root_; }
-    
+
     // Access to NodePool
     NodePool& get_node_pool() { return node_pool_; }
     const NodePool& get_node_pool() const { return node_pool_; }
-    std::shared_ptr<IInputDevice> get_input_device() const { return input_device_; }
 
     // Access to EventBus
     EventBus& get_event_bus() { return event_bus_; }
@@ -40,8 +39,9 @@ public:
 private:
     Node* root_ = nullptr;  // Raw pointer - owned by node_pool_
     NodePool node_pool_;  // Owns all nodes
+    EventBus event_bus_;   // Owns the event bus
+    std::shared_ptr<IInputDevice> input_device_;
     bool running_ = true;
-    
 };
 
 }  // namespace nathan
