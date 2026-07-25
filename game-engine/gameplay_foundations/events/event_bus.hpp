@@ -7,13 +7,10 @@
 
 namespace nathan {
 
-// Global event bus - singleton for global events (not hierarchical)
+// Global event bus
 class EventBus : public EventEmitter {
 public:
-    static EventBus& global() {
-        static EventBus instance;
-        return instance;
-    }
+    EventBus() = default;
 
     // Emit globally
     template<typename T>
@@ -27,10 +24,11 @@ public:
         return on<T>(event_type, callback);
     }
 
-private:
-    EventBus() = default;
+    // Delete copy but allow move
     EventBus(const EventBus&) = delete;
     EventBus& operator=(const EventBus&) = delete;
+    EventBus(EventBus&&) = default;
+    EventBus& operator=(EventBus&&) = default;
 };
 
 }  // namespace nathan

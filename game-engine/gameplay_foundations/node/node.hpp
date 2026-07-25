@@ -10,6 +10,8 @@ namespace nathan {
 
 // Scene Graph Node - represents an entity in the scene hierarchy
 // A scene graph is a tree structure where nodes can have parent-child relationships
+class Engine;  // Forward declaration
+
 class Node {
 public:
     virtual ~Node() = default;
@@ -31,22 +33,21 @@ public:
     bool is_destroyed() const { return destroyed_; }
     void set_destroyed(bool destroyed) { destroyed_ = destroyed; }
 
-    // Tree modification - uses global NodePool
+    // Engine accessor
+    Engine* get_engine() const { return engine_; }
+    void set_engine(Engine* engine) { engine_ = engine; }
+
+    // Tree modification - uses Engine's NodePool
     void add_child(std::unique_ptr<Node> child);
     void remove_child(Node* child);
     void destroy();  // Mark this node for deletion (removes self from parent)
-
-    // Factory for creating event-enabled nodes
-    template<typename T, typename... Args>
-    static std::unique_ptr<T> create(Args&&... args) {
-        return std::make_unique<T>(std::forward<Args>(args)...);
-    }
 
 private:
     std::string name_;
     Node* parent_ = nullptr;
     std::vector<Node*> children_;  // Raw pointers - owned by NodePool
     bool destroyed_ = false;       // Marked for deletion (deferred removal)
+    Engine* engine_ = nullptr;     // Engine this node belongs to
 };
 
 }  // namespace nathan

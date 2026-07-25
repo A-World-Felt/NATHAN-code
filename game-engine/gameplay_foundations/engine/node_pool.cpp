@@ -8,8 +8,8 @@ Node* NodePool::create(std::unique_ptr<Node> node) {
     if (!node) {
         return nullptr;
     }
-    Node* raw_ptr = node.get();
     node_pool_.push_back(std::move(node));
+    Node* raw_ptr = node_pool_.back().get();
     raw_ptr->setup();  // Automatically call setup when node is created
     return raw_ptr;
 }

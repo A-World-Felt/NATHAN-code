@@ -5,5 +5,8 @@
   "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
   "C_Cpp.codeAnalysis.clangTidy.checks.disabled": [
     "clang-diagnostic-error"
-  ]
+  ],
+  "cmake.ctest.neverDebugTestsWithLaunchConfiguration": true,
+  "cmake.ctest.testExplorerIntegrationEnabled": true,
+  "cmake.ctest.testSuiteDelimiter": "\\."
 }

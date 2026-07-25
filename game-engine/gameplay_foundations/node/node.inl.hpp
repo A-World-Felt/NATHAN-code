@@ -8,24 +8,20 @@
 
 namespace nathan {
 
-inline void Node::setup() {
-    // Default: do nothing
-}
+inline void Node::setup() {}
 
-inline void Node::loop(float delta) {
-    // Default: do nothing
-}
+inline void Node::loop(float delta) {}
 
-inline void Node::cleanup() {
-    // Default: do nothing
-}
+inline void Node::cleanup() {}
 
-// Tree modification - uses singleton Engine
 inline void Node::add_child(std::unique_ptr<Node> child) {
     Node* raw = child.get();
     raw->parent_ = this;
+    raw->engine_ = engine_;  // Child inherits engine from parent
     children_.push_back(raw);
-    Engine::instance().get_node_pool().create(std::move(child));
+    if (engine_) {
+        engine_->get_node_pool().create(std::move(child));
+    }
     // Note: setup() is called automatically by NodePool::create()
 }
 
@@ -33,7 +29,9 @@ inline void Node::remove_child(Node* child) {
     auto it = std::find(children_.begin(), children_.end(), child);
     if (it != children_.end()) {
         child->parent_ = nullptr;
-        Engine::instance().get_node_pool().destroy(child);
+        if (engine_) {
+            engine_->get_node_pool().destroy(child);
+        }
         children_.erase(it);
     }
 }
@@ -41,8 +39,8 @@ inline void Node::remove_child(Node* child) {
 inline void Node::destroy() {
     if (parent_) {
         parent_->remove_child(this);
-    } else {
-        Engine::instance().get_node_pool().destroy(this);
+    } else if (engine_) {
+        engine_->get_node_pool().destroy(this);
     }
 }
 
