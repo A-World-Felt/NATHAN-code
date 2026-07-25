@@ -1,21 +1,22 @@
-#ifndef IInput_hpp
-#define IInput_hpp
-#include "input_types.h"
+#ifndef GAME_ENGINE_INPUTS_IINPUT_DEVICE_H_
+#define GAME_ENGINE_INPUTS_IINPUT_DEVICE_H_
+
+#include "input_types.hpp"
 
 namespace nathan {
 
 class IInputDevice {
 public:
     virtual ~IInputDevice() = default;
-    virtual void update() = 0;
 
+    virtual void update() = 0;
     virtual void new_frame() = 0;
 
-    virtual bool is_button_pressed(gamepad_button) = 0;
-    virtual bool is_button_released(gamepad_button) = 0;
-    virtual int16_t get_axis_value(gamepad_axis) = 0;
+    virtual bool is_button_pressed(GamepadButton) = 0;
+    virtual bool is_button_released(GamepadButton) = 0;
+    virtual int16_t get_axis_value(GamepadAxis) = 0;
 };
 
-}
+} // namespace nathan
 
-#endif
+#endif // GAME_ENGINE_INPUTS_IINPUT_DEVICE_H_

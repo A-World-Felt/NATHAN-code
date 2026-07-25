@@ -2,7 +2,7 @@
 #include "scene_manager.hpp"
 
 #include <iostream>
-#include <inputs/input_types.h>
+#include <inputs/input_types.hpp>
 
 namespace nathan {
 
@@ -12,11 +12,11 @@ void MainMenu::setup() {
 
 void MainMenu::loop(float delta) {
     // Input test
-    if (Engine::instance().get_input_device()->is_button_pressed(gamepad_button::left_face_button)) {
+    if (Engine::instance().get_input_device()->is_button_pressed(GamepadButton::kLeftFaceButton)) {
         std::cout << "Button pressed\n";
     }
 
-    std::cout << Engine::instance().get_input_device()->get_axis_value(gamepad_axis::x_left_joystick) << std::endl;
+    std::cout << Engine::instance().get_input_device()->get_axis_value(GamepadAxis::kXLeftJoystickAxis) << std::endl;
 
     // static float timer = 0.0f;
     // timer += delta;

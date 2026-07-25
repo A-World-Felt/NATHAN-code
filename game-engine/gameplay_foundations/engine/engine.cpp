@@ -5,8 +5,7 @@
 #include <chrono>
 #include <iostream>
 #include <thread>
-
-#include "inputs/SDL/sdl_input_device.hpp"
+#include "inputs/sdl/sdl_input_device.hpp"
 
 namespace nathan {
 

@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL_init.h>
 #include <SDL3/SDL_log.h>
+#include <cstdlib>
 
 namespace nathan {
 
@@ -35,7 +36,7 @@ void SDLInputDevice::new_frame() {
     previous_button_ = current_button_;
 }
 
-bool SDLInputDevice::is_button_pressed(const gamepad_button gb) {
+bool SDLInputDevice::is_button_pressed(const GamepadButton gb) {
     const auto button_id = static_cast<size_t>(gb);
     const auto is_cur_down = current_button_.at(button_id);
     const auto is_prev_down = previous_button_.at(button_id);
@@ -43,7 +44,7 @@ bool SDLInputDevice::is_button_pressed(const gamepad_button gb) {
     return is_cur_down && !is_prev_down;
 }
 
-bool SDLInputDevice::is_button_released(const gamepad_button gb) {
+bool SDLInputDevice::is_button_released(const GamepadButton gb) {
     const auto button_id = static_cast<size_t>(gb);
     const auto is_cur_down = current_button_.at(button_id);
     const auto is_prev_down = previous_button_.at(button_id);
@@ -51,7 +52,7 @@ bool SDLInputDevice::is_button_released(const gamepad_button gb) {
     return !is_cur_down && is_prev_down;
 }
 
-int16_t SDLInputDevice::get_axis_value(gamepad_axis ga) {
+int16_t SDLInputDevice::get_axis_value(GamepadAxis ga) {
     const auto axis_id = static_cast<size_t>(ga);
     return axis_.at(axis_id);
 }
@@ -68,35 +69,35 @@ void SDLInputDevice::handle_event(const SDL_Event &event) {
     }
 }
 
-gamepad_button SDLInputDevice::to_engine(const SDL_GamepadButton sdl_gb) {
+GamepadButton SDLInputDevice::to_engine(const SDL_GamepadButton sdl_gb) {
     switch (sdl_gb) {
-        case SDL_GAMEPAD_BUTTON_NORTH:          return gamepad_button::top_face_button;
-        case SDL_GAMEPAD_BUTTON_WEST:           return gamepad_button::left_face_button;
-        case SDL_GAMEPAD_BUTTON_EAST:           return gamepad_button::right_face_button;
-        case SDL_GAMEPAD_BUTTON_SOUTH:          return gamepad_button::bottom_face_button;
-        case SDL_GAMEPAD_BUTTON_DPAD_UP:        return gamepad_button::up_dpad_button;
-        case SDL_GAMEPAD_BUTTON_DPAD_LEFT:      return gamepad_button::left_dpad_button;
-        case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:     return gamepad_button::right_dpad_button;
-        case SDL_GAMEPAD_BUTTON_DPAD_DOWN:      return gamepad_button::down_dpad_button;
-        case SDL_GAMEPAD_BUTTON_LEFT_SHOULDER:  return gamepad_button::left_trigger_button;
-        case SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER: return gamepad_button::right_trigger_button;
-        case SDL_GAMEPAD_BUTTON_LEFT_STICK:     return gamepad_button::left_joystick_button;
-        case SDL_GAMEPAD_BUTTON_RIGHT_STICK:    return gamepad_button::right_joystick_button;
-        case SDL_GAMEPAD_BUTTON_START:          return gamepad_button::start_button;
-        default: return gamepad_button::invalid_button;
+        case SDL_GAMEPAD_BUTTON_NORTH:          return GamepadButton::kTopFaceButton;
+        case SDL_GAMEPAD_BUTTON_WEST:           return GamepadButton::kLeftFaceButton;
+        case SDL_GAMEPAD_BUTTON_EAST:           return GamepadButton::kRightFaceButton;
+        case SDL_GAMEPAD_BUTTON_SOUTH:          return GamepadButton::kBottomFaceButton;
+        case SDL_GAMEPAD_BUTTON_DPAD_UP:        return GamepadButton::kUpDPadButton;
+        case SDL_GAMEPAD_BUTTON_DPAD_LEFT:      return GamepadButton::kLeftDPadButton;
+        case SDL_GAMEPAD_BUTTON_DPAD_RIGHT:     return GamepadButton::kRightDPadButton;
+        case SDL_GAMEPAD_BUTTON_DPAD_DOWN:      return GamepadButton::kDownDPadButton;
+        case SDL_GAMEPAD_BUTTON_LEFT_SHOULDER:  return GamepadButton::kLeftBumperButton;
+        case SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER: return GamepadButton::kRightBumperButton;
+        case SDL_GAMEPAD_BUTTON_LEFT_STICK:     return GamepadButton::kLeftJoystickButton;
+        case SDL_GAMEPAD_BUTTON_RIGHT_STICK:    return GamepadButton::kRightJoystickButton;
+        case SDL_GAMEPAD_BUTTON_START:          return GamepadButton::kStartButton;
+        default: return GamepadButton::kInvalidButton;
     }
 }
 
-gamepad_axis SDLInputDevice::to_engine(const SDL_GamepadAxis sdl_ga) {
+GamepadAxis SDLInputDevice::to_engine(const SDL_GamepadAxis sdl_ga) {
     switch (sdl_ga) {
-        case SDL_GAMEPAD_AXIS_LEFTX:            return gamepad_axis::x_left_joystick;
-        case SDL_GAMEPAD_AXIS_LEFTY:            return gamepad_axis::y_left_joystick;
-        case SDL_GAMEPAD_AXIS_RIGHTX:           return gamepad_axis::x_right_joystick;
-        case SDL_GAMEPAD_AXIS_RIGHTY:           return gamepad_axis::y_right_joystick;
-        case SDL_GAMEPAD_AXIS_LEFT_TRIGGER:     return gamepad_axis::left_trigger;
-        case SDL_GAMEPAD_AXIS_RIGHT_TRIGGER:    return gamepad_axis::right_trigger;
-        default: return gamepad_axis::invalid_axis;
+        case SDL_GAMEPAD_AXIS_LEFTX:            return GamepadAxis::kXLeftJoystickAxis;
+        case SDL_GAMEPAD_AXIS_LEFTY:            return GamepadAxis::kYLeftJoystickAxis;
+        case SDL_GAMEPAD_AXIS_RIGHTX:           return GamepadAxis::kXRightJoystickAxis;
+        case SDL_GAMEPAD_AXIS_RIGHTY:           return GamepadAxis::kYRightJoystickAxis;
+        case SDL_GAMEPAD_AXIS_LEFT_TRIGGER:     return GamepadAxis::kLeftTriggerAxis;
+        case SDL_GAMEPAD_AXIS_RIGHT_TRIGGER:    return GamepadAxis::kRightTriggerAxis;
+        default: return GamepadAxis::kInvalidAxis;
     }
 }
 
-} // nathan
+} // namespace nathan
