@@ -11,6 +11,19 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 set(CMAKE_C_FLAGS_DEBUG "-g -O0")
 
+# SDL Build Flags
+set(SDL_UNIX_CONSOLE_BUILD ON CACHE BOOL "" FORCE)
+set(SDL_GAMEPAD ON CACHE BOOL "" FORCE)
+set(SDL_JOYSTICK ON CACHE BOOL "" FORCE)
+set(SDL_HAPTIC ON CACHE BOOL "" FORCE)
+
+set(SDL_AUDIO OFF CACHE BOOL "" FORCE)
+set(SDL_CAMERA OFF CACHE BOOL "" FORCE)
+set(SDL_SENSOR OFF CACHE BOOL "" FORCE)
+set(SDL_VIDEO OFF CACHE BOOL "" FORCE)
+set(SDL_GPU OFF CACHE BOOL "" FORCE)
+set(SDL_RENDER OFF CACHE BOOL "" FORCE)
+
 # Engine library
 add_library(gameplay_foundations
     # Events
@@ -30,10 +43,12 @@ add_library(gameplay_foundations
     gameplay_foundations/engine/engine.cpp
     gameplay_foundations/engine/node_pool.hpp
     gameplay_foundations/engine/node_pool.cpp
+
+    # Inputs
     gameplay_foundations/inputs/iinput_device.hpp
     gameplay_foundations/inputs/sdl/sdl_input_device.cpp
     gameplay_foundations/inputs/sdl/sdl_input_device.hpp
-    gameplay_foundations/inputs/input_types.h
+    gameplay_foundations/inputs/input_types.hpp
 )
 
 target_include_directories(gameplay_foundations PUBLIC
@@ -41,7 +56,7 @@ target_include_directories(gameplay_foundations PUBLIC
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/node
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/events
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/engine
-    ${CMAKE_SOURCE_DIR}/vendor/sdl/include
+    ${CMAKE_SOURCE_DIR}/vendor/SDL/include
 )
 
 add_subdirectory(vendor/SDL EXCLUDE_FROM_ALL)
