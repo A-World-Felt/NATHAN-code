@@ -10,6 +10,9 @@ public:
     void setup() override;
     void loop(float delta) override;
     void cleanup() override;
+
+private:
+    bool is_game_started_ = false;
 };
 
 }  // namespace nathan

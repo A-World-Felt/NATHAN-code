@@ -33,6 +33,23 @@ public:
             }
         }
     }
+
+    // Emit event on the global event bus
+    template<typename T>
+    void emit_global(std::string event_type, const T& data) {
+        if (Engine *engine = get_engine()) {
+            engine->get_event_bus().emit_global<T>(event_type, data);
+        }
+    }
+
+    // Subscribe to events on the global event bus
+    template<typename T>
+    ConnectionToken on_global(std::string event_type, std::function<void(const T&)> callback) {
+        if (Engine *engine = get_engine()) {
+            return engine->get_event_bus().on_global<T>(event_type, callback);
+        }
+        return {};
+    }
 };
 
 }  // namespace nathan

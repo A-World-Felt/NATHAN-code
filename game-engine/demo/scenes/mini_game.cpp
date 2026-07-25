@@ -20,6 +20,21 @@ void Player::setup() {
     on<std::string>("welcome", [this](const std::string& msg) {
         std::cout << "[Player] Received welcome: " << msg << "\n";
     });
+
+    on_global<std::pair<GamepadAxis, float>>("axis_value_changed", [this](const std::pair<GamepadAxis, float>& axis) {
+        if (axis.first == GamepadAxis::kXLeftJoystickAxis) {
+            const float axis_val = axis.second;
+            if (std::abs(axis_val) < 0.1f)
+                return;
+            std::cout << "X: " << axis_val << "\n";
+        }
+        else if (axis.first == GamepadAxis::kYLeftJoystickAxis) {
+            const float axis_val = axis.second;
+            if (std::abs(axis_val) < 0.1f)
+                return;
+            std::cout << "Y: " << axis_val << "\n";
+        }
+    });
 }
 
 void Player::loop(float delta) {

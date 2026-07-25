@@ -74,8 +74,8 @@ void SDLInputDevice::handle_event(const SDL_Event &event) {
     }
     else if (event.type == SDL_EVENT_GAMEPAD_AXIS_MOTION) {
         GamepadAxis gamepad_axis = to_engine(static_cast<SDL_GamepadAxis>(event.gaxis.axis));
-        event_bus_.emit_global<GamepadAxis>(
-            "axis_value_changed", gamepad_axis
+        event_bus_.emit_global<std::pair<GamepadAxis, float>>(
+            "axis_value_changed", std::pair{gamepad_axis, static_cast<float>(event.gaxis.value) / SDL_MAX_SINT16}
         );
         axis_.at(static_cast<uint8_t>(gamepad_axis)) = event.gaxis.value;
     }
