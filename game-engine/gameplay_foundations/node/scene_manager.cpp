@@ -36,11 +36,8 @@ void SceneManager::switch_to_scene(std::unique_ptr<Node> new_scene) {
 
     // Set new scene
     new_scene->set_name("current_scene");
-    current_scene_ = new_scene.get();
     add_child(std::move(new_scene));
-
-    // Initialize the new scene
-    current_scene_->setup();
+    current_scene_ = get_children().back();  // Now owned by children_ vector
 
     std::cout << "[SceneManager] Scene switched!\n";
 }

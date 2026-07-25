@@ -3,6 +3,7 @@
 
 #include "events/connection.hpp"
 
+#include <algorithm>
 #include <functional>
 #include <memory>
 #include <mutex>

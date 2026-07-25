@@ -59,6 +59,16 @@ target_include_directories(gameplay_foundations PUBLIC
     ${CMAKE_SOURCE_DIR}/vendor/SDL/include
 )
 
+# Coverage option
+option(ENABLE_COVERAGE "Enable code coverage with gcov" OFF)
+if(ENABLE_COVERAGE)
+    target_compile_options(gameplay_foundations PRIVATE --coverage)
+    target_link_options(gameplay_foundations PRIVATE --coverage)
+endif()
+
+# Tests option
+option(BUILD_TESTING "Build tests" ON)
+
 add_subdirectory(vendor/SDL EXCLUDE_FROM_ALL)
 
 target_link_libraries(gameplay_foundations PRIVATE SDL3::SDL3)
@@ -84,3 +94,13 @@ if(WIN32)
 endif()
 
 target_link_libraries(demo_game PRIVATE gameplay_foundations)
+
+if(ENABLE_COVERAGE)
+    target_compile_options(demo_game PRIVATE --coverage)
+    target_link_options(demo_game PRIVATE --coverage)
+endif()
+
+if(BUILD_TESTING)
+    enable_testing()
+    add_subdirectory(tests)
+endif()

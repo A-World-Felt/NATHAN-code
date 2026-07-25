@@ -11,7 +11,6 @@ namespace nathan {
 
 Engine::Engine() : root_(nullptr), running_(true) {
     // NodePool is initialized as a member
-    input_device_ = std::make_shared<SDLInputDevice>(event_bus_);
 }
 
 Engine& Engine::instance() {
@@ -22,6 +21,8 @@ Engine& Engine::instance() {
 void Engine::set_root(std::unique_ptr<Node> scene) {
     root_ = scene.get();
     if (scene) {
+        // Set engine on root node before adding to pool
+        scene->set_engine(this);
         node_pool_.create(std::move(scene));
         // setup() is called automatically by NodePool::create()
     }
@@ -62,7 +63,10 @@ void Engine::run() {
         // Input events update
         input_device_->update();
 
-        // FIXED UPDATE LOOP - iterate all nodes in pool
+        // Input events update
+        input_device_->update();
+
+        // UPDATE LOOP - iterate all nodes in pool
         while (accumulator >= fixed_dt) {
             // Loop through all active nodes
             for (auto& node_ptr : node_pool_.get_pool()) {

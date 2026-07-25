@@ -63,17 +63,29 @@ This will run a demo game that shows:
 
 ### Create a custom node
 
-All game entities are **Nodes**. Create your own by inheriting from the Node class:
+All game entities are **Nodes**. Create your own by inheriting from `Node` (for basic entities) or `EventNode` (for entities that emit/listen to events):
 
 ```cpp
 // my_node.hpp
-#include "gameplay_foundations/node/node.hpp"
+#include "node/node.hpp"
 
-class MyNode : public Node {
+class MyNode : public nathan::Node {
 public:
     void setup() override;    // Called when node is created
     void loop(float delta) override;  // Called every frame
     void cleanup() override;  // Called when node is destroyed
+};
+```
+
+For nodes with event capabilities, inherit from `EventNode`:
+
+```cpp
+// my_event_node.hpp
+#include "node/event_node.hpp"
+
+class MyEventNode : public nathan::EventNode {
+public:
+    void setup() override;
 };
 ```
 
@@ -102,9 +114,9 @@ A scene is just a Node with children:
 
 ```cpp
 // my_scene.hpp
-#include "gameplay_foundations/node/node.hpp"
+#include "node/node.hpp"
 
-class MyScene : public Node {
+class MyScene : public nathan::Node {
 public:
     void setup() override;
 };
@@ -118,8 +130,10 @@ public:
 void MyScene::setup() {
     // Create and add a node to the scene
     auto my_node = std::make_unique<MyNode>();
-    my_node->name = "my_node";
+    my_node->set_name("my_node");
     add_child(std::move(my_node));
+    
+    // Children automatically inherit the Engine from their parent
 }
 ```
 
@@ -127,17 +141,21 @@ void MyScene::setup() {
 
 ```cpp
 // main.cpp
-#include "gameplay_foundations/engine/engine.hpp"
+#include "engine/engine.hpp"
 #include "my_scene.hpp"
 
 int main() {
-    Engine::instance().set_root(std::make_unique<MyScene>());
-    Engine::instance().run();
+    nathan::Engine engine;
+    engine.set_root(std::make_unique<MyScene>());
+    engine.run();
     return 0;
 }
 ```
 
 ## Key Concepts
+
+### Engine
+The central manager. Create an instance per game. Each Engine owns a `NodePool` (manages all nodes) and an `EventBus` (global event handling).
 
 ### Scenes
 Your game is organized into **scenes** - different screens like main menus, gameplay levels, etc. Switch between them using `SceneManager`.
@@ -145,12 +163,29 @@ Your game is organized into **scenes** - different screens like main menus, game
 ### Nodes
 Everything in your game is a **Node** - players, enemies, UI elements, etc. Nodes form a tree structure where each node can have children.
 
+- **Node** - Base class for entities without event capabilities
+- **EventNode** - Inherits from Node and EventEmitter; use for entities that emit/listen to events
+
+### Engine Injection
+Nodes receive their Engine pointer through:
+- Parent inheritance: Children automatically inherit Engine from parent when added via `add_child()`
+- Manual setting: Use `node.set_engine(engine)` for nodes created without a parent
+
 ### Events
 Nodes can **emit** events (like "collision" or "score_update") and **listen** for events from other nodes. This is how game elements communicate.
 
+```cpp
+// In an EventNode
+on<ScoreEvent>("score", [this](const ScoreEvent& e) {
+    score_ += e.points;
+});
+
+emit<ScoreEvent>("score", {100, "coin"});
+```
+
 ### Lifecycle
 - **setup()** - Called automatically when a node is created
-- **loop(delta)** - Called automatically every frame
+- **loop(delta)** - Called automatically every frame (delta = time since last frame in seconds)
 - **cleanup()** - Called automatically when a node is destroyed
 
 You rarely need to call these manually.
@@ -158,8 +193,8 @@ You rarely need to call these manually.
 ## Next Steps
 
 1. **Explore the demo** - Look at `demo/scenes/` to see how the example game is structured
-2. **Create your own nodes** - Start with simple entities and build up
-3. **Use events** - Try emitting and listening to custom events
+2. **Create your own nodes** - Inherit from `Node` or `EventNode`, add `using Base::Base;`, override lifecycle methods
+3. **Use events** - Inherit from `EventNode`, use `on<T>()` to subscribe and `emit<T>()` to send events
 4. **Build a complete game** - Combine scenes, nodes, and events
 
 For more technical details, see the documentation in `gameplay_foundations/README.md`.
