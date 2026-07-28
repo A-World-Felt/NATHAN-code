@@ -18,7 +18,6 @@ SDLInputDevice::SDLInputDevice(EventBus& event_bus) : IInputDevice(event_bus) {
     for (int i = 0; i < count; i++) {
         SDL_Gamepad *gamepad = SDL_OpenGamepad(devices[i]);
         SDL_Log("%s", SDL_GetGamepadName(gamepad));
-        gamepads_.push_back(gamepad);
     }
     SDL_free(devices);
 }

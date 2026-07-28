@@ -11,9 +11,9 @@
 namespace nathan {
 namespace {
 
-class TestSDLInputDevice : public ::testing::Test {
+class SDLInputDeviceTest : public ::testing::Test {
 public:
-    TestSDLInputDevice() : device_(event_bus_) {}
+    SDLInputDeviceTest() : device_(event_bus_) {}
 
 protected:
     // Builds a minimal SDL_Event for a gamepad button transition.
@@ -47,7 +47,7 @@ protected:
 // rather than calling to_engine() directly.
 // ---------------------------------------------------------------------
 
-TEST_F(TestSDLInputDevice, NorthButtonMapsCorrectly) {
+TEST_F(SDLInputDeviceTest, NorthButtonMapsCorrectly) {
     GamepadButton received = GamepadButton::kInvalidButton;
     event_bus_.on_global<GamepadButton>("button_pressed",
         [&](const GamepadButton& button) { received = button; });
@@ -57,7 +57,7 @@ TEST_F(TestSDLInputDevice, NorthButtonMapsCorrectly) {
     EXPECT_EQ(received, GamepadButton::kTopFaceButton);
 }
 
-TEST_F(TestSDLInputDevice, InvalidButtonMapsCorrectly) {
+TEST_F(SDLInputDeviceTest, InvalidButtonMapsCorrectly) {
     GamepadButton received = GamepadButton::kTopFaceButton;  // sentinel, overwritten if the callback fires
     event_bus_.on_global<GamepadButton>("button_pressed",
         [&](const GamepadButton& button) { received = button; });
@@ -76,7 +76,7 @@ TEST_F(TestSDLInputDevice, InvalidButtonMapsCorrectly) {
     EXPECT_EQ(received, GamepadButton::kInvalidButton);
 }
 
-TEST_F(TestSDLInputDevice, LeftXAxisMapsCorrectly) {
+TEST_F(SDLInputDeviceTest, LeftXAxisMapsCorrectly) {
     std::pair<GamepadAxis, float> received{GamepadAxis::kInvalidAxis, 0.0f};
     event_bus_.on_global<std::pair<GamepadAxis, float>>("axis_value_changed",
         [&](const std::pair<GamepadAxis, float>& payload) { received = payload; });
@@ -90,7 +90,7 @@ TEST_F(TestSDLInputDevice, LeftXAxisMapsCorrectly) {
 // Frame bookkeeping / edge-detection logic
 // ---------------------------------------------------------------------
 
-TEST_F(TestSDLInputDevice, NewFrameCopiesCurrentState) {
+TEST_F(SDLInputDeviceTest, NewFrameCopiesCurrentState) {
     // Fresh device: current_button_ and previous_button_ both start false,
     // so pressing START creates a current != previous mismatch.
     device_.handle_event(MakeButtonEvent(SDL_EVENT_GAMEPAD_BUTTON_DOWN, SDL_GAMEPAD_BUTTON_START));
@@ -106,13 +106,13 @@ TEST_F(TestSDLInputDevice, NewFrameCopiesCurrentState) {
     EXPECT_FALSE(device_.is_button_released(GamepadButton::kStartButton));
 }
 
-TEST_F(TestSDLInputDevice, ButtonPressedReturnsTrue) {
+TEST_F(SDLInputDeviceTest, ButtonPressedReturnsTrue) {
     device_.handle_event(MakeButtonEvent(SDL_EVENT_GAMEPAD_BUTTON_DOWN, SDL_GAMEPAD_BUTTON_SOUTH));
 
     EXPECT_TRUE(device_.is_button_pressed(GamepadButton::kBottomFaceButton));
 }
 
-TEST_F(TestSDLInputDevice, ButtonReleasedReturnsTrue) {
+TEST_F(SDLInputDeviceTest, ButtonReleasedReturnsTrue) {
     device_.handle_event(MakeButtonEvent(SDL_EVENT_GAMEPAD_BUTTON_DOWN, SDL_GAMEPAD_BUTTON_SOUTH));
     device_.new_frame();  // previous_button_ becomes true for SOUTH
     device_.handle_event(MakeButtonEvent(SDL_EVENT_GAMEPAD_BUTTON_UP, SDL_GAMEPAD_BUTTON_SOUTH));
@@ -120,7 +120,7 @@ TEST_F(TestSDLInputDevice, ButtonReleasedReturnsTrue) {
     EXPECT_TRUE(device_.is_button_released(GamepadButton::kBottomFaceButton));
 }
 
-TEST_F(TestSDLInputDevice, AxisValueReturnedCorrectly) {
+TEST_F(SDLInputDeviceTest, AxisValueReturnedCorrectly) {
     device_.handle_event(MakeAxisEvent(SDL_GAMEPAD_AXIS_LEFTX, 12345));
 
     EXPECT_EQ(device_.get_axis_value(GamepadAxis::kXLeftJoystickAxis), 12345);
@@ -134,14 +134,14 @@ TEST_F(TestSDLInputDevice, AxisValueReturnedCorrectly) {
 // observe state changes except through those same accessors.
 // ---------------------------------------------------------------------
 
-TEST_F(TestSDLInputDevice, HandleButtonDownUpdatesState) {
+TEST_F(SDLInputDeviceTest, HandleButtonDownUpdatesState) {
     device_.handle_event(MakeButtonEvent(SDL_EVENT_GAMEPAD_BUTTON_DOWN, SDL_GAMEPAD_BUTTON_SOUTH));
 
     EXPECT_TRUE(device_.is_button_pressed(GamepadButton::kBottomFaceButton));
     EXPECT_FALSE(device_.is_button_released(GamepadButton::kBottomFaceButton));
 }
 
-TEST_F(TestSDLInputDevice, HandleButtonUpUpdatesState) {
+TEST_F(SDLInputDeviceTest, HandleButtonUpUpdatesState) {
     device_.handle_event(MakeButtonEvent(SDL_EVENT_GAMEPAD_BUTTON_DOWN, SDL_GAMEPAD_BUTTON_SOUTH));
     device_.new_frame();
     device_.handle_event(MakeButtonEvent(SDL_EVENT_GAMEPAD_BUTTON_UP, SDL_GAMEPAD_BUTTON_SOUTH));
@@ -150,7 +150,7 @@ TEST_F(TestSDLInputDevice, HandleButtonUpUpdatesState) {
     EXPECT_FALSE(device_.is_button_pressed(GamepadButton::kBottomFaceButton));
 }
 
-TEST_F(TestSDLInputDevice, HandleAxisMotionUpdatesAxis) {
+TEST_F(SDLInputDeviceTest, HandleAxisMotionUpdatesAxis) {
     device_.handle_event(MakeAxisEvent(SDL_GAMEPAD_AXIS_RIGHTY, -20000));
 
     EXPECT_EQ(device_.get_axis_value(GamepadAxis::kYRightJoystickAxis), -20000);
@@ -160,7 +160,7 @@ TEST_F(TestSDLInputDevice, HandleAxisMotionUpdatesAxis) {
 // handle_event() event emission
 // ---------------------------------------------------------------------
 
-TEST_F(TestSDLInputDevice, ButtonDownEmitsEvent) {
+TEST_F(SDLInputDeviceTest, ButtonDownEmitsEvent) {
     GamepadButton received = GamepadButton::kInvalidButton;
     bool called = false;
     event_bus_.on_global<GamepadButton>("button_pressed",
@@ -175,7 +175,7 @@ TEST_F(TestSDLInputDevice, ButtonDownEmitsEvent) {
     EXPECT_EQ(received, GamepadButton::kBottomFaceButton);
 }
 
-TEST_F(TestSDLInputDevice, ButtonUpEmitsEvent) {
+TEST_F(SDLInputDeviceTest, ButtonUpEmitsEvent) {
     GamepadButton received = GamepadButton::kInvalidButton;
     bool called = false;
     event_bus_.on_global<GamepadButton>("button_released",
@@ -190,7 +190,7 @@ TEST_F(TestSDLInputDevice, ButtonUpEmitsEvent) {
     EXPECT_EQ(received, GamepadButton::kBottomFaceButton);
 }
 
-TEST_F(TestSDLInputDevice, AxisMotionEmitsEvent) {
+TEST_F(SDLInputDeviceTest, AxisMotionEmitsEvent) {
     std::pair<GamepadAxis, float> received{GamepadAxis::kInvalidAxis, 0.0f};
     bool called = false;
     event_bus_.on_global<std::pair<GamepadAxis, float>>("axis_value_changed",
