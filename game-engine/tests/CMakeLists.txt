@@ -45,6 +45,15 @@ target_include_directories(game_engine_tests PRIVATE
     ${gmock_SOURCE_DIR}
 )
 
+if (WIN32)
+    add_custom_command(TARGET game_engine_tests POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_RUNTIME_DLLS:game_engine_tests>
+            $<TARGET_FILE_DIR:game_engine_tests>
+            COMMAND_EXPAND_LISTS
+    )
+endif()
+
 # Add test to CTest - auto-discover individual tests
 include(GoogleTest)
 gtest_discover_tests(game_engine_tests)
