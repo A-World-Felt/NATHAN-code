@@ -9,68 +9,68 @@
 
 namespace nathan {
 
-    Engine::Engine() : root_(nullptr), running_(true) {
-        input_device_ = std::make_shared<SDLInputDevice>(event_bus_);
+Engine::Engine() : root_(nullptr), running_(true) {
+    input_device_ = std::make_shared<SDLInputDevice>(event_bus_);
+}
+
+void Engine::set_root(std::unique_ptr<Node> scene) {
+    root_ = scene.get();
+    if (scene) {
+        // Set engine on root node before adding to pool
+        scene->set_engine(this);
+        node_pool_.create(std::move(scene));
+        // setup() is called automatically by NodePool::create()
     }
+}
 
-    void Engine::set_root(std::unique_ptr<Node> scene) {
-        root_ = scene.get();
-        if (scene) {
-            // Set engine on root node before adding to pool
-            scene->set_engine(this);
-            node_pool_.create(std::move(scene));
-            // setup() is called automatically by NodePool::create()
-        }
-    }
+void Engine::stop() {
+    running_ = false;
+}
 
-    void Engine::stop() {
-        running_ = false;
-    }
+void Engine::run() {
+    if (!root_) return;
 
-    void Engine::run() {
-        if (!root_) return;
+    std::cout << "[Engine] Starting game loop...\n";
 
-        std::cout << "[Engine] Starting game loop...\n";
+    using clock = std::chrono::high_resolution_clock;
 
-        using clock = std::chrono::high_resolution_clock;
+    constexpr float fixed_dt = 1.0f / 60.0f; // 60 FPS physics
+    float accumulator = 0.0f;
 
-        constexpr float fixed_dt = 1.0f / 60.0f; // 60 FPS physics
-        float accumulator = 0.0f;
+    auto previous = clock::now();
 
-        auto previous = clock::now();
+    while (running_) {
+        auto now = clock::now();
+        float frame_time =
+            std::chrono::duration<float>(now - previous).count();
 
-        while (running_) {
-            auto now = clock::now();
-            float frame_time =
-                std::chrono::duration<float>(now - previous).count();
+        previous = now;
 
-            previous = now;
+        // Safety clamp (prevents debugger spikes)
+        if (frame_time > 0.25f)
+            frame_time = 0.25f;
 
-            // Safety clamp (prevents debugger spikes)
-            if (frame_time > 0.25f)
-                frame_time = 0.25f;
+        accumulator += frame_time;
 
-            accumulator += frame_time;
+        input_device_->update();
 
-            input_device_->update();
+        // Process destroyed nodes BEFORE traversal
+        node_pool_.cleanup_destroyed();
 
-            // Process destroyed nodes BEFORE traversal
-            node_pool_.cleanup_destroyed();
-
-            // UPDATE LOOP - iterate all nodes in pool
-            while (accumulator >= fixed_dt) {
-                // Loop through all active nodes
-                for (auto& node_ptr : node_pool_.get_pool()) {
-                    if (!node_ptr->is_destroyed()) {
-                        node_ptr->loop(fixed_dt);
-                    }
+        // UPDATE LOOP - iterate all nodes in pool
+        while (accumulator >= fixed_dt) {
+            // Loop through all active nodes
+            for (auto& node_ptr : node_pool_.get_pool()) {
+                if (!node_ptr->is_destroyed()) {
+                    node_ptr->loop(fixed_dt);
                 }
-                accumulator -= fixed_dt;
             }
-
-            // Optional: prevent 100% CPU usage
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            accumulator -= fixed_dt;
         }
+
+        // Optional: prevent 100% CPU usage
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
+}
 
 }  // namespace nathan
