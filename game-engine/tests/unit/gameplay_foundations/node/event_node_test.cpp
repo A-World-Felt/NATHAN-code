@@ -6,6 +6,7 @@
 
 #include "gameplay_foundations/node/event_node.hpp"
 #include "gameplay_foundations/node/node.hpp"
+#include "gameplay_foundations/engine/engine.hpp"
 
 namespace nathan {
 
@@ -190,4 +191,39 @@ TEST(EventNodeTest, ConnectionTokenIsValid) {
     EXPECT_TRUE(connection.is_valid());
     EXPECT_NE(connection.get_emitter(), nullptr);
     EXPECT_NE(connection.get_id(), 0);
+}
+
+// Tests for global event subscriptions
+TEST(EventNodeTest, GlobalSubscriptionsAreCleanedUpOnDestroy) {
+    nathan::Engine engine;
+    int call_count1 = 0;
+    int call_count2 = 0;
+    
+    auto node1 = std::make_unique<nathan::EventNode>();
+    node1->set_engine(&engine);
+    node1->on_global<int>("test", [&](const int&) { 
+        call_count1++; 
+    });
+    nathan::Node* node1_ptr = engine.get_node_pool().create(std::move(node1));
+    
+    auto node2 = std::make_unique<nathan::EventNode>();
+    node2->set_engine(&engine);
+    node2->on_global<int>("test", [&](const int&) { 
+        call_count2++; 
+    });
+    nathan::Node* node2_ptr = engine.get_node_pool().create(std::move(node2));
+    
+    engine.get_event_bus().emit_global<int>("test", 0);
+    EXPECT_EQ(call_count1, 1);
+    EXPECT_EQ(call_count2, 1);
+    
+    node1_ptr->destroy();
+    engine.get_event_bus().emit_global<int>("test", 0);
+    EXPECT_EQ(call_count1, 1);
+    EXPECT_EQ(call_count2, 2);
+    
+    node2_ptr->destroy();
+    engine.get_event_bus().emit_global<int>("test", 0);
+    EXPECT_EQ(call_count1, 1);
+    EXPECT_EQ(call_count2, 2);
 }
