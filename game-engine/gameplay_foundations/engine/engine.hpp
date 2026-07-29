@@ -3,6 +3,8 @@
 
 #include "engine/node_pool.hpp"
 #include "events/event_bus.hpp"
+#include "resources/resource_manager.hpp"
+#include "resources/config_manager.hpp"
 
 namespace nathan {
 
@@ -35,10 +37,20 @@ public:
     EventBus& get_event_bus() { return event_bus_; }
     const EventBus& get_event_bus() const { return event_bus_; }
 
+    // Access to ResourceManager
+    ResourceManager& get_resource_manager() { return resource_manager_; }
+    const ResourceManager& get_resource_manager() const { return resource_manager_; }
+
+    // Access to ConfigManager
+    ConfigManager& get_config_manager() { return config_manager_; }
+    const ConfigManager& get_config_manager() const { return config_manager_; }
+
 private:
     Node* root_ = nullptr;  // Raw pointer - owned by node_pool_
     NodePool node_pool_;  // Owns all nodes
     EventBus event_bus_;   // Owns the event bus
+    ResourceManager resource_manager_;  // Manages game resources
+    ConfigManager config_manager_;    // Manages configuration
     bool running_ = true;
     
 };
