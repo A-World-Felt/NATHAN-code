@@ -8,6 +8,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -33,11 +34,11 @@ public:
             callback(*typed_data);
         };
         
-        callbacks_[std::string(event_type)].push_back({
+        callbacks_[event_type].push_back({
             token.get_id(),
             wrapped,
             [this, token, event_type]() {
-                this->disconnect_internal(token, std::string(event_type));
+                this->disconnect_internal(token, event_type);
             }
         });
         
@@ -51,18 +52,17 @@ public:
         
         auto token = ConnectionToken(static_cast<void*>(this));
         
-        std::string event_type_str(event_type);
-        auto wrapped = [callback, this, token, event_type_str](const void* data) {
+        auto wrapped = [callback, this, token, event_type](const void* data) {
             const T* typed_data = static_cast<const T*>(data);
             callback(*typed_data);
-            this->disconnect_internal(token, event_type_str);
+            this->disconnect_internal(token, event_type);
         };
         
-        callbacks_[event_type_str].push_back({
+        callbacks_[event_type].push_back({
             token.get_id(),
             wrapped,
-            [this, token, event_type_str]() {
-                this->disconnect_internal(token, event_type_str);
+            [this, token, event_type]() {
+                this->disconnect_internal(token, event_type);
             }
         });
         
@@ -82,7 +82,7 @@ public:
     // Disconnect all subscriptions for a specific event type
     void off(std::string_view event_type) {
         std::lock_guard<std::mutex> lock(mutex_);
-        callbacks_.erase(std::string(event_type));
+        callbacks_.erase(event_type);
     }
 
     // Disconnect all subscriptions
@@ -98,7 +98,7 @@ protected:
         std::vector<CallbackEntry> callbacks_copy;
         {
             std::lock_guard<std::mutex> lock(mutex_);
-            auto it = callbacks_.find(std::string(event_type));
+            auto it = callbacks_.find(event_type);
             if (it != callbacks_.end()) {
                 callbacks_copy = it->second;
             }
@@ -117,10 +117,10 @@ private:
         std::function<void()> disconnect;
     };
     
-    std::unordered_map<std::string, std::vector<CallbackEntry>> callbacks_;
+    std::unordered_map<std::string_view, std::vector<CallbackEntry>> callbacks_;
     mutable std::mutex mutex_;
     
-    void disconnect_internal(const ConnectionToken& token, std::string event_type) {
+    void disconnect_internal(const ConnectionToken& token, std::string_view event_type) {
         auto it = callbacks_.find(event_type);
         if (it == callbacks_.end()) return;
         

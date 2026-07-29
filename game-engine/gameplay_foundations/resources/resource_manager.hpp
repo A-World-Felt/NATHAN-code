@@ -36,8 +36,20 @@ public:
     // If already loaded, returns existing instance
     std::shared_ptr<Resource> load(std::string_view path);
 
+    // Load a resource as a specific type (with automatic casting)
+    template <typename T>
+    std::shared_ptr<T> load_as(std::string_view path) {
+        return std::static_pointer_cast<T>(load(path));
+    }
+
     // Get existing resource by path without loading
     std::shared_ptr<Resource> get(std::string_view path) const;
+
+    // Get a resource as a specific type (with automatic casting)
+    template <typename T>
+    std::shared_ptr<T> get_as(std::string_view path) const {
+        return std::static_pointer_cast<T>(get(path));
+    }
 
     // Check if a resource is loaded
     bool is_loaded(std::string_view path) const;

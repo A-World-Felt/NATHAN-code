@@ -1,4 +1,5 @@
 #include "resource_manager.hpp"
+#include "text_resource.hpp"
 
 #include <filesystem>
 #include <iostream>
@@ -70,17 +71,18 @@ std::shared_ptr<Resource> ResourceManager::load(std::string_view path) {
         c = static_cast<char>(::tolower(static_cast<unsigned char>(c)));
     }
 
-    // For now, no resource types are implemented
+    if (ext == ".txt") {
+        resource = std::make_shared<TextResource>(resolved_path);
+        if (resource->load()) {
+            resources_[resolved_path] = resource;
+            std::cout << "[ResourceManager] Loaded: " << resolved_path << std::endl;
+            return resource;
+        }
+    }
+
     // Unsupported resource type
-    std::cerr << "Unsupported resource type: " << resolved_path << std::endl;
+    std::cerr << "[ResourceManager] Unsupported resource type: " << resolved_path << std::endl;
     return nullptr;
-
-    // Store in cache
-    resources_[resolved_path] = resource;
-
-    std::cout << "[ResourceManager] Loaded: " << resolved_path << std::endl;
-
-    return resource;
 }
 
 std::shared_ptr<Resource> ResourceManager::get(std::string_view path) const {

@@ -12,6 +12,7 @@ class Resource {
 public:
     enum class Type {
         Unknown,
+        Text,
         // Future types can be added here (Audio, Texture, Font, etc.)
     };
 

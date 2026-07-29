@@ -2,7 +2,9 @@
 #include "scene_manager.hpp"
 
 #include <iostream>
+#include <memory>
 #include <inputs/input_types.hpp>
+#include "resources/text_resource.hpp"
 
 namespace nathan {
 
@@ -37,6 +39,11 @@ void MainMenu::setup() {
             std::cout << "[MainMenu] Difficulty: " << config.get_int("difficulty", 2) << "\n";
             std::cout << "[MainMenu] Fullscreen: " << (config.get_bool("fullscreen", false) ? "true" : "false") << "\n";
             std::cout << "[MainMenu] Player Name: " << config.get_string("player_name", "Player1") << "\n";
+        }
+        
+        // ResourceManager example usage - load a text file
+        if (auto text = engine->get_resource_manager().load_as<TextResource>("demo/dialogue.txt")) {
+            std::cout << "[MainMenu] Dialogue: " << text->get_content() << "\n";
         }
     }
     

@@ -28,7 +28,7 @@ public:
     }
     
     bool was_loaded() const { return loaded_; }
-    
+
 private:
     bool loaded_;
 };
@@ -41,68 +41,59 @@ TEST(ResourceManagerTest, DefaultConstructorCreatesEmptyManager) {
     EXPECT_EQ(manager.get_total_count(), 0);
 }
 
-TEST(ResourceManagerTest, PushAndPopBasePath) {
+TEST(ResourceManagerTest, PushBasePathUpdatesCurrentPath) {
     nathan::ResourceManager manager;
-    
-    EXPECT_EQ(manager.get_current_base_path(), "");
-    
     manager.push_base_path("/path/to/resources");
     EXPECT_EQ(manager.get_current_base_path(), "/path/to/resources");
-    
-    manager.push_base_path("/another/path");
-    EXPECT_EQ(manager.get_current_base_path(), "/another/path");
-    
+}
+
+TEST(ResourceManagerTest, PushMultipleBasePathsStacksCorrectly) {
+    nathan::ResourceManager manager;
+    manager.push_base_path("/path/one");
+    manager.push_base_path("/path/two");
+    EXPECT_EQ(manager.get_current_base_path(), "/path/two");
+}
+
+TEST(ResourceManagerTest, PopBasePathReturnsToPrevious) {
+    nathan::ResourceManager manager;
+    manager.push_base_path("/path/one");
+    manager.push_base_path("/path/two");
     manager.pop_base_path();
-    EXPECT_EQ(manager.get_current_base_path(), "/path/to/resources");
-    
-    manager.pop_base_path();
-    EXPECT_EQ(manager.get_current_base_path(), "");
-    
-    // Pop from empty stack should not crash
+    EXPECT_EQ(manager.get_current_base_path(), "/path/one");
+}
+
+TEST(ResourceManagerTest, PopBasePathFromEmptyStackDoesNothing) {
+    nathan::ResourceManager manager;
     manager.pop_base_path();
     EXPECT_EQ(manager.get_current_base_path(), "");
 }
 
-TEST(ResourceManagerTest, ResolvePathWithBasePath) {
+TEST(ResourceManagerTest, PopBasePathFromSingleEntryClearsPath) {
     nathan::ResourceManager manager;
-    
-    // Without base path, returns original
-    EXPECT_EQ(manager.get_current_base_path(), "");
-    
-    manager.push_base_path("/base/path/");
-    
-    // Current base path should be set
-    EXPECT_EQ(manager.get_current_base_path(), "/base/path/");
-    
+    manager.push_base_path("/path/one");
     manager.pop_base_path();
-}
-
-TEST(ResourceManagerTest, UnloadAllClearsResources) {
-    nathan::ResourceManager manager;
-    
-    // This test would need actual resource loading
-    // For now, just test that unload_all doesn't crash
-    manager.unload_all();
-    EXPECT_EQ(manager.get_total_count(), 0);
-}
-
-TEST(ResourceManagerTest, UnloadUnusedWithNoResources) {
-    nathan::ResourceManager manager;
-    
-    // Should not crash with empty manager
-    manager.unload_unused();
-    EXPECT_EQ(manager.get_total_count(), 0);
+    EXPECT_EQ(manager.get_current_base_path(), "");
 }
 
 TEST(ResourceManagerTest, GetNonExistentResourceReturnsNullptr) {
     nathan::ResourceManager manager;
-    
-    auto resource = manager.get("nonexistent.wav");
+    auto resource = manager.get("nonexistent");
     EXPECT_EQ(resource, nullptr);
 }
 
 TEST(ResourceManagerTest, IsLoadedForNonExistentResourceReturnsFalse) {
     nathan::ResourceManager manager;
-    
-    EXPECT_FALSE(manager.is_loaded("nonexistent.wav"));
+    EXPECT_FALSE(manager.is_loaded("nonexistent"));
+}
+
+TEST(ResourceManagerTest, UnloadAllOnEmptyManagerDoesNothing) {
+    nathan::ResourceManager manager;
+    manager.unload_all();
+    EXPECT_EQ(manager.get_total_count(), 0);
+}
+
+TEST(ResourceManagerTest, UnloadUnusedOnEmptyManagerDoesNothing) {
+    nathan::ResourceManager manager;
+    manager.unload_unused();
+    EXPECT_EQ(manager.get_total_count(), 0);
 }

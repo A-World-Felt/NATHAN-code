@@ -48,6 +48,8 @@ add_library(gameplay_foundations
     gameplay_foundations/resources/resource.hpp
     gameplay_foundations/resources/resource_manager.hpp
     gameplay_foundations/resources/resource_manager.cpp
+    gameplay_foundations/resources/text_resource.hpp
+    gameplay_foundations/resources/text_resource.cpp
     gameplay_foundations/resources/config.hpp
     gameplay_foundations/resources/config.cpp
     gameplay_foundations/resources/config_manager.hpp
