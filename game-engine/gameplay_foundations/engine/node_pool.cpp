@@ -19,6 +19,7 @@ void NodePool::destroy(Node* node) {
         // Disconnect event subscriptions first to prevent dangling callbacks
         if (auto* event_node = dynamic_cast<EventNode*>(node)) {
             event_node->off_all();
+            event_node->off_all_global();
         }
         
         // Recursively destroy all children first (depth-first)

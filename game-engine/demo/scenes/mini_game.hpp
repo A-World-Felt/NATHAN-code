@@ -26,6 +26,10 @@ public:
     void set_x(float x) { x_ = x; }
     float get_y() const { return y_; }
     void set_y(float y) { y_ = y; }
+    float get_axis_x() const { return axis_x_; }
+    void set_axis_x(float v) { axis_x_ = v; }
+    float get_axis_y() const { return axis_y_; }
+    void set_axis_y(float v) { axis_y_ = v; }
     float get_speed() const { return speed_; }
     void set_speed(float speed) { speed_ = speed; }
     int get_coins_collected() const { return coins_collected_; }
@@ -39,7 +43,8 @@ public:
     void loop(float delta) override;
 
 private:
-    float x_ = 0, y_ = 0;
+    float x_ = 0.0f, y_ = 0.0f;
+    float axis_x_ = 0.0f, axis_y_ = 0.0f;
     float speed_ = 15.0f;
     int coins_collected_ = 0;
     int jump_count_ = 0;

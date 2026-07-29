@@ -1,6 +1,7 @@
 #include "engine/engine.hpp"
 #include "engine/node_pool.hpp"
 #include "node/node.hpp"
+#include "inputs/sdl/sdl_input_device.hpp"
 
 #include <chrono>
 #include <iostream>
@@ -8,7 +9,9 @@
 
 namespace nathan {
 
-Engine::Engine() : root_(nullptr), running_(true) {}
+Engine::Engine() : root_(nullptr), running_(true) {
+    input_device_ = std::make_shared<SDLInputDevice>(event_bus_);
+}
 
 void Engine::set_root(std::unique_ptr<Node> scene) {
     root_ = scene.get();
@@ -48,6 +51,8 @@ void Engine::run() {
             frame_time = 0.25f;
 
         accumulator += frame_time;
+
+        input_device_->update();
 
         // Process destroyed nodes BEFORE traversal
         node_pool_.cleanup_destroyed();
