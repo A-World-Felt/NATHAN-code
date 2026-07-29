@@ -1,6 +1,7 @@
 #ifndef GAME_ENGINE_ENGINE_ENGINE_H_
 #define GAME_ENGINE_ENGINE_ENGINE_H_
 
+#include "audio/sound.hpp"
 #include "engine/node_pool.hpp"
 #include "events/event_bus.hpp"
 #include "inputs/iinput_device.hpp"
@@ -37,11 +38,12 @@ public:
     const EventBus& get_event_bus() const { return event_bus_; }
 
 private:
-    Node* root_ = nullptr;  // Raw pointer - owned by node_pool_
+    Node* root_;  // Raw pointer - owned by node_pool_
     NodePool node_pool_;  // Owns all nodes
     EventBus event_bus_;   // Owns the event bus
     std::shared_ptr<IInputDevice> input_device_;
-    bool running_ = true;
+    SoundScape sound_scape_;
+    bool running_;
 };
 
 }  // namespace nathan

@@ -9,7 +9,7 @@
 
 namespace nathan {
 
-Engine::Engine() : root_(nullptr), running_(true) {
+Engine::Engine() : root_(nullptr), sound_scape_(event_bus_), running_(true) {
     input_device_ = std::make_shared<SDLInputDevice>(event_bus_);
 }
 
