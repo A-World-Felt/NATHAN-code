@@ -48,6 +48,8 @@ add_library(gameplay_foundations
     gameplay_foundations/resources/resource.hpp
     gameplay_foundations/resources/resource_manager.hpp
     gameplay_foundations/resources/resource_manager.cpp
+    gameplay_foundations/resources/config.hpp
+    gameplay_foundations/resources/config.cpp
     gameplay_foundations/resources/config_manager.hpp
     gameplay_foundations/resources/config_manager.cpp
 
@@ -65,7 +67,7 @@ target_include_directories(gameplay_foundations PUBLIC
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/engine
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/resources
     ${CMAKE_SOURCE_DIR}/vendor/SDL/include
-    ${CMAKE_SOURCE_DIR}/vendor
+    ${CMAKE_SOURCE_DIR}/vendor/toml++
 )
 
 # Coverage option

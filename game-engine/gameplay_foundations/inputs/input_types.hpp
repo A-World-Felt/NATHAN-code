@@ -1,6 +1,8 @@
 #ifndef GAME_ENGINE_INPUTS_INPUT_TYPES_H_
 #define GAME_ENGINE_INPUTS_INPUT_TYPES_H_
 
+#include <string_view>
+
 enum class GamepadButton : int8_t {
     kInvalidButton = -1,
     kTopFaceButton,
@@ -29,5 +31,14 @@ enum class GamepadAxis : int8_t {
     kRightTriggerAxis,
     kCount
 };
+
+namespace sdl_events {
+
+// SDL input event types
+inline constexpr std::string_view button_pressed = "button_pressed";
+inline constexpr std::string_view button_released = "button_released";
+inline constexpr std::string_view axis_value_changed = "axis_value_changed";
+
+} // namespace sdl_events
 
 #endif // GAME_ENGINE_INPUTS_INPUT_TYPES_H_

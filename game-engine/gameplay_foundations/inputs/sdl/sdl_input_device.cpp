@@ -60,21 +60,21 @@ void SDLInputDevice::handle_event(const SDL_Event &event) {
     if (event.type == SDL_EVENT_GAMEPAD_BUTTON_DOWN) {
         GamepadButton gamepad_button = to_engine(static_cast<SDL_GamepadButton>(event.gbutton.button));
         event_bus_.emit_global<GamepadButton>(
-            "button_pressed", gamepad_button
+            sdl_events::button_pressed, gamepad_button
         );
         current_button_.at(static_cast<uint8_t>(gamepad_button)) = true;
     }
     else if (event.type == SDL_EVENT_GAMEPAD_BUTTON_UP) {
         GamepadButton gamepad_button = to_engine(static_cast<SDL_GamepadButton>(event.gbutton.button));
         event_bus_.emit_global<GamepadButton>(
-            "button_released", gamepad_button
+            sdl_events::button_released, gamepad_button
         );
         current_button_.at(static_cast<uint8_t>(gamepad_button)) = false;
     }
     else if (event.type == SDL_EVENT_GAMEPAD_AXIS_MOTION) {
         GamepadAxis gamepad_axis = to_engine(static_cast<SDL_GamepadAxis>(event.gaxis.axis));
         event_bus_.emit_global<std::pair<GamepadAxis, float>>(
-            "axis_value_changed", std::pair{gamepad_axis, static_cast<float>(event.gaxis.value) / SDL_MAX_SINT16}
+            sdl_events::axis_value_changed, std::pair{gamepad_axis, static_cast<float>(event.gaxis.value) / SDL_MAX_SINT16}
         );
         axis_.at(static_cast<uint8_t>(gamepad_axis)) = event.gaxis.value;
     }

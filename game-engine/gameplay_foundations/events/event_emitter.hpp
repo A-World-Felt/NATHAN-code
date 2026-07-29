@@ -22,7 +22,7 @@ public:
 
     // Subscribe to events of type T, returns token for disconnecting
     template<typename T>
-    ConnectionToken on(std::string event_type, std::function<void(const T&)> callback) {
+    ConnectionToken on(std::string_view event_type, std::function<void(const T&)> callback) {
         std::lock_guard<std::mutex> lock(mutex_);
         
         auto token = ConnectionToken(static_cast<void*>(this));
@@ -33,11 +33,11 @@ public:
             callback(*typed_data);
         };
         
-        callbacks_[event_type].push_back({
+        callbacks_[std::string(event_type)].push_back({
             token.get_id(),
             wrapped,
             [this, token, event_type]() {
-                this->disconnect_internal(token, event_type);
+                this->disconnect_internal(token, std::string(event_type));
             }
         });
         
@@ -46,22 +46,23 @@ public:
 
     // Subscribe once (auto-disconnect after first call)
     template<typename T>
-    ConnectionToken once(std::string event_type, std::function<void(const T&)> callback) {
+    ConnectionToken once(std::string_view event_type, std::function<void(const T&)> callback) {
         std::lock_guard<std::mutex> lock(mutex_);
         
         auto token = ConnectionToken(static_cast<void*>(this));
         
-        auto wrapped = [callback, this, token, event_type](const void* data) {
+        std::string event_type_str(event_type);
+        auto wrapped = [callback, this, token, event_type_str](const void* data) {
             const T* typed_data = static_cast<const T*>(data);
             callback(*typed_data);
-            this->disconnect_internal(token, event_type);
+            this->disconnect_internal(token, event_type_str);
         };
         
-        callbacks_[event_type].push_back({
+        callbacks_[event_type_str].push_back({
             token.get_id(),
             wrapped,
-            [this, token, event_type]() {
-                this->disconnect_internal(token, event_type);
+            [this, token, event_type_str]() {
+                this->disconnect_internal(token, event_type_str);
             }
         });
         
@@ -79,9 +80,9 @@ public:
     }
 
     // Disconnect all subscriptions for a specific event type
-    void off(std::string event_type) {
+    void off(std::string_view event_type) {
         std::lock_guard<std::mutex> lock(mutex_);
-        callbacks_.erase(event_type);
+        callbacks_.erase(std::string(event_type));
     }
 
     // Disconnect all subscriptions
@@ -93,11 +94,11 @@ public:
 protected:
     // Emit event to subscribers (internal, for bubbling)
     template<typename T>
-    void emit_internal(std::string event_type, const T& data, Node* sender = nullptr) {
+    void emit_internal(std::string_view event_type, const T& data, Node* sender = nullptr) {
         std::vector<CallbackEntry> callbacks_copy;
         {
             std::lock_guard<std::mutex> lock(mutex_);
-            auto it = callbacks_.find(event_type);
+            auto it = callbacks_.find(std::string(event_type));
             if (it != callbacks_.end()) {
                 callbacks_copy = it->second;
             }

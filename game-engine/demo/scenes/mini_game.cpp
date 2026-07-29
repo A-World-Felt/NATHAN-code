@@ -1,6 +1,6 @@
 #include "mini_game.hpp"
 #include "scene_manager.hpp"
-
+#include "../events/demo_event_types.hpp"
 #include <iostream>
 
 namespace nathan {
@@ -10,18 +10,18 @@ namespace nathan {
 void Player::setup() {
     std::cout << "[Player] Created at (" << x_ << ", " << y_ << ")\n";
     
-    on<CollisionEvent>("collision", [this](const CollisionEvent& event) {
+    on<CollisionEvent>(demo::events::collision, [this](const CollisionEvent& event) {
         std::cout << "[Player] Collided with " << event.with 
                   << " (force: " << event.force << ")\n";
         coins_collected_++;
-        emit<ScoreEvent>("score", {static_cast<int>(event.force * 10), "coin_collect"});
+        emit<ScoreEvent>(demo::events::score, {static_cast<int>(event.force * 10), "coin_collect"});
     });
     
-    on<std::string>("welcome", [this](const std::string& msg) {
+    on<std::string>(demo::events::welcome, [this](const std::string& msg) {
         std::cout << "[Player] Received welcome: " << msg << "\n";
     });
 
-    on_global<std::pair<GamepadAxis, float>>("axis_value_changed", [this](const std::pair<GamepadAxis, float>& axis) {
+    on_global<std::pair<GamepadAxis, float>>(sdl_events::axis_value_changed, [this](const std::pair<GamepadAxis, float>& axis) {
         constexpr float kDeadzone = 0.1f;
         const float val = std::abs(axis.second) < kDeadzone ? 0.0f : axis.second;
 
@@ -32,7 +32,7 @@ void Player::setup() {
         }
     });
 
-    on_global<GamepadButton>("button_pressed", [this](const GamepadButton& button) {
+    on_global<GamepadButton>(sdl_events::button_pressed, [this](const GamepadButton& button) {
         if (button == GamepadButton::kBottomFaceButton) {
             std::cout << "[Player] Jumping!\n";
         }
@@ -57,7 +57,7 @@ void Player::loop(float delta) {
     
     if (coins_collected_ == 0 && x_ >= 49.5f && y_ <= 50.5f) {
         std::cout << "[Player] Reached coin position! Triggering collision...\n";
-        emit<CollisionEvent>("collision", {"coin", 2.5f});
+        emit<CollisionEvent>(demo::events::collision, {"coin", 2.5f});
         // set_coins_collected(1);
     }
     
@@ -80,11 +80,11 @@ void Coin::setup() {
     std::cout << "[Coin] Created at (" << get_x() << ", " 
               << get_y() << ") with value " << get_value() << "\n";
     
-    on<std::string>("position_update", [this](const std::string& pos) {
+    on<std::string>(demo::events::position_update, [this](const std::string& pos) {
         std::cout << "[Coin] Heard position update: " << pos << "\n";
     });
     
-    on<std::string>("welcome", [this](const std::string& msg) {
+    on<std::string>(demo::events::welcome, [this](const std::string& msg) {
         std::cout << "[Coin] Received welcome: " << msg << "\n";
     });
 }
@@ -96,13 +96,13 @@ void Coin::loop(float delta) {}
 void ScoreDisplay::setup() {
     std::cout << "[ScoreDisplay] Ready. Score: " << get_score() << "\n";
     
-    on<ScoreEvent>("score", [this](const ScoreEvent& event) {
+    on<ScoreEvent>(demo::events::score, [this](const ScoreEvent& event) {
         set_score(get_score() + event.points);
         std::cout << "[ScoreDisplay] +" << event.points << " points (" 
                   << event.source << "). Total: " << get_score() << "\n";
     });
     
-    on<std::string>("welcome", [this](const std::string& msg) {
+    on<std::string>(demo::events::welcome, [this](const std::string& msg) {
         std::cout << "[ScoreDisplay] Received welcome: " << msg << "\n";
     });
 }
@@ -130,21 +130,21 @@ void MiniGame::setup() {
     
     std::cout << "[MiniGame] Game ready!\n";
     
-    on<ScoreEvent>("score", [this](const ScoreEvent& event) {
+    on<ScoreEvent>(demo::events::score, [this](const ScoreEvent& event) {
         std::cout << "[MiniGame] Score event received: +" << event.points 
                   << " (" << event.source << ") - forwarding to children\n";
-        emit_to_children<ScoreEvent>("score", event);
+        emit_to_children<ScoreEvent>(demo::events::score, event);
     });
     
-    on<std::string>("position_update", [this](const std::string& pos) {
-        emit_to_children<std::string>("position_update", pos);
+    on<std::string>(demo::events::position_update, [this](const std::string& pos) {
+        emit_to_children<std::string>(demo::events::position_update, pos);
     });
     
-    on<std::string>("player_jump", [this](const std::string& jump_type) {
+    on<std::string>(demo::events::player_jump, [this](const std::string& jump_type) {
         std::cout << "[MiniGame] Player jumped: " << jump_type << "\n";
     });
     
-    emit_to_children<std::string>("welcome", "Mini-game started!");
+    emit_to_children<std::string>(demo::events::welcome, "Mini-game started!");
 }
 
 void MiniGame::loop(float delta) {

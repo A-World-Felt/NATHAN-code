@@ -14,7 +14,7 @@ class EventNode : public Node, public EventEmitter {
 public:
     // Emit event that bubbles up to parent
     template<typename T>
-    void emit(std::string event_type, const T& data) {
+    void emit(std::string_view event_type, const T& data) {
         // First, notify local subscribers
         emit_internal<T>(event_type, data, this);
         
@@ -26,7 +26,7 @@ public:
     
     // Emit event to children only
     template<typename T>
-    void emit_to_children(std::string event_type, const T& data) {
+    void emit_to_children(std::string_view event_type, const T& data) {
         for (Node* child : get_children()) {
             if (!child->is_destroyed()) {
                 if (EventNode* event_child = dynamic_cast<EventNode*>(child)) {
@@ -39,7 +39,7 @@ public:
 
     // Emit event on the global event bus
     template<typename T>
-    void emit_global(std::string event_type, const T& data) {
+    void emit_global(std::string_view event_type, const T& data) {
         if (Engine *engine = get_engine()) {
             engine->get_event_bus().emit_global<T>(event_type, data);
         }
@@ -47,7 +47,7 @@ public:
 
     // Subscribe to events on the global event bus
     template<typename T>
-    ConnectionToken on_global(std::string event_type, std::function<void(const T&)> callback) {
+    ConnectionToken on_global(std::string_view event_type, std::function<void(const T&)> callback) {
         if (Engine *engine = get_engine()) {
             ConnectionToken token = engine->get_event_bus().on_global<T>(event_type, callback);
             if (token.is_valid()) {

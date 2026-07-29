@@ -3,17 +3,23 @@
 
 #include <string>
 #include <string_view>
+#include <unordered_map>
 
-#include "nlohmann/json.hpp"
+#include "config.hpp"
 
 namespace nathan {
 
-// Manages persistent configuration settings stored in JSON files
+// Predefined config definition - links name and path together
+struct ConfigDef {
+    std::string_view name;
+    std::string_view path;
+};
+
+// Manages multiple named Config instances
 class ConfigManager {
 public:
-
-    ConfigManager();
-    explicit ConfigManager(std::string_view config_path);
+    ConfigManager() = default;
+    explicit ConfigManager(std::string_view default_config_path);
 
     // Delete copy/move
     ConfigManager(const ConfigManager&) = delete;
@@ -21,40 +27,30 @@ public:
     ConfigManager(ConfigManager&&) = delete;
     ConfigManager& operator=(ConfigManager&&) = delete;
 
-    // Path management
-    void set_config_path(std::string_view path);
-    std::string_view get_config_path() const;
+    // Default config definition
+    static constexpr ConfigDef kDefaultConfig{"default", "config.toml"};
 
-    // Load from file
-    bool load();
-    bool load(std::string_view path);
+    // Access a named config (creates if doesn't exist with optional path)
+    Config& get_or_create(std::string_view name, std::string_view path = "");
+    
+    // Access a named config using a predefined ConfigDef (ensures name+path stay together)
+    Config& get_or_create(const ConfigDef& config_def);
+    
+    // Access a named config (returns nullptr if doesn't exist)
+    Config* get(std::string_view name);
+    const Config* get(std::string_view name) const;
+    
+    // Check if a named config exists
+    bool has(std::string_view name) const;
 
-    // Save to file
-    bool save();
-    bool save(std::string_view path);
+    // Load a named config from file (uses stored path)
+    bool load(std::string_view name);
 
-    // Type-safe getters
-    float get_float(std::string_view key, float default_value = 0.0f) const;
-    int get_int(std::string_view key, int default_value = 0) const;
-    bool get_bool(std::string_view key, bool default_value = false) const;
-    std::string get_string(std::string_view key, std::string_view default_value = "") const;
-
-    // Type-safe setters
-    void set_float(std::string_view key, float value);
-    void set_int(std::string_view key, int value);
-    void set_bool(std::string_view key, bool value);
-    void set_string(std::string_view key, std::string_view value);
-
-    // Check if config has unsaved changes
-    bool is_dirty() const;
-
-    // Force save if dirty
-    void save_if_dirty();
+    // Save a named config to file (uses stored path)
+    bool save(std::string_view name);
 
 private:
-    std::string config_path_ = "config.json";
-    mutable bool dirty_ = false;
-    nlohmann::json data_;
+    std::unordered_map<std::string, Config> configs_;
 };
 
 } // namespace nathan
