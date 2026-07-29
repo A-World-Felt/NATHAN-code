@@ -24,6 +24,11 @@ public:
         return on<T>(event_type, callback);
     }
 
+    // Unsubscribe a specific global subscription
+    void off_global(const ConnectionToken& token) {
+        off(token);
+    }
+
     // Delete copy but allow move
     EventBus(const EventBus&) = delete;
     EventBus& operator=(const EventBus&) = delete;
