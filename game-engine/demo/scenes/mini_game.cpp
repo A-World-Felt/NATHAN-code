@@ -8,48 +8,70 @@ namespace nathan {
 // PLAYER - Demonstrates: emitting events, subscribing to events
 
 void Player::setup() {
-    std::cout << "[Player] Created at (" << get_x() << ", " << get_y() << ")\n";
+    std::cout << "[Player] Created at (" << x_ << ", " << y_ << ")\n";
     
     on<CollisionEvent>("collision", [this](const CollisionEvent& event) {
         std::cout << "[Player] Collided with " << event.with 
                   << " (force: " << event.force << ")\n";
-        set_coins_collected(get_coins_collected() + 1);
+        coins_collected_++;
         emit<ScoreEvent>("score", {static_cast<int>(event.force * 10), "coin_collect"});
     });
     
     on<std::string>("welcome", [this](const std::string& msg) {
         std::cout << "[Player] Received welcome: " << msg << "\n";
     });
+
+    on_global<std::pair<GamepadAxis, float>>("axis_value_changed", [this](const std::pair<GamepadAxis, float>& axis) {
+        constexpr float kDeadzone = 0.1f;
+        const float val = std::abs(axis.second) < kDeadzone ? 0.0f : axis.second;
+
+        if (axis.first == GamepadAxis::kXLeftJoystickAxis) {
+            axis_x_ = val;
+        } else if (axis.first == GamepadAxis::kYLeftJoystickAxis) {
+            axis_y_ = val;
+        }
+    });
+
+    on_global<GamepadButton>("button_pressed", [this](const GamepadButton& button) {
+        if (button == GamepadButton::kBottomFaceButton) {
+            std::cout << "[Player] Jumping!\n";
+        }
+    });
 }
 
 void Player::loop(float delta) {
-    set_x(get_x() + get_speed() * delta);
+    // set_x(get_x() + get_speed() * delta);
+    // set_x(get_x() + get_axis_x() * get_speed() * delta);
+    // set_y(get_y() + get_axis_y() * get_speed() * delta);
+    x_ += axis_x_ * speed_ * delta;
+    y_ -= axis_y_ * speed_ * delta;
+    std::cout << "[Player] X: " << x_ << " Y: " << y_ << "\n";
     
-    int x_int = static_cast<int>(get_x());
-    if (x_int != get_last_position() && x_int <= 60) {
-        set_last_position(x_int);
-        if (x_int > 0) {
-            emit<std::string>("position_update", "x=" + std::to_string(x_int));
-        }
-    }
+    // int x_int = static_cast<int>(get_x());
+    // if (x_int != get_last_position() && x_int <= 60) {
+    //     set_last_position(x_int);
+    //     if (x_int > 0) {
+    //         emit<std::string>("position_update", "x=" + std::to_string(x_int));
+    //     }
+    // }
     
-    if (get_coins_collected() == 0 && get_x() >= 49.5f && get_x() <= 50.5f) {
+    if (coins_collected_ == 0 && x_ >= 49.5f && y_ <= 50.5f) {
         std::cout << "[Player] Reached coin position! Triggering collision...\n";
         emit<CollisionEvent>("collision", {"coin", 2.5f});
-        set_coins_collected(1);
+        // set_coins_collected(1);
     }
     
-    if (get_coins_collected() == 0) {
-        if (x_int >= 20 && x_int < 21 && get_jump_count() == 0) {
-            set_jump_count(1);
-            std::cout << "[Player] Jumping at x=" << x_int << "!\n";
-            emit<std::string>("player_jump", "hop");
-        } else if (x_int >= 40 && x_int < 41 && get_jump_count() == 1) {
-            set_jump_count(2);
-            std::cout << "[Player] Jumping at x=" << x_int << "!\n";
-            emit<std::string>("player_jump", "double_hop");
-        }
-    }
+    // if (get_coins_collected() == 0) {
+    //     if (x_int >= 20 && x_int < 21 && get_jump_count() == 0) {
+    //         set_jump_count(1);
+    //         std::cout << "[Player] Jumping at x=" << x_int << "!\n";
+    //         emit<std::string>("player_jump", "hop");
+    //     } else if (x_int >= 40 && x_int < 41 && get_jump_count() == 1) {
+    //         set_jump_count(2);
+    //         std::cout << "[Player] Jumping at x=" << x_int << "!\n";
+    //         emit<std::string>("player_jump", "double_hop");
+    //     }
+    // }
 }
 
 // COIN - Demonstrates: subscribing to events from other nodes
@@ -127,7 +149,7 @@ void MiniGame::setup() {
 
 void MiniGame::loop(float delta) {
     timer_ += delta;
-    std::cout << "[MiniGame] Running... (" << timer_ << "s)\n";
+    // std::cout << "[MiniGame] Running... (" << timer_ << "s)\n";
     
     if (timer_ >= 5.0f) {
         std::cout << "[MiniGame] User clicked 'Quit'\n";

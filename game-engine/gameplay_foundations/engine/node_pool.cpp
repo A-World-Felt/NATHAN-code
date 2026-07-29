@@ -8,8 +8,8 @@ Node* NodePool::create(std::unique_ptr<Node> node) {
     if (!node) {
         return nullptr;
     }
-    Node* raw_ptr = node.get();
     node_pool_.push_back(std::move(node));
+    Node* raw_ptr = node_pool_.back().get();
     raw_ptr->setup();  // Automatically call setup when node is created
     return raw_ptr;
 }
@@ -19,6 +19,7 @@ void NodePool::destroy(Node* node) {
         // Disconnect event subscriptions first to prevent dangling callbacks
         if (auto* event_node = dynamic_cast<EventNode*>(node)) {
             event_node->off_all();
+            event_node->off_all_global();
         }
         
         // Recursively destroy all children first (depth-first)
