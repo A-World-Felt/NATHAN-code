@@ -68,3 +68,37 @@ TEST(Vector3Test, ChainedAdditionAndScalarMultiplicationProduceExpectedResult) {
     nathan::Vector3 expected_result{6.0f, 8.0f, 10.0f};
     EXPECT_EQ(result, expected_result);
 }
+
+TEST(Vector3Test, OperatorEqualsReturnsTrueForEqualVectors) {
+    nathan::Vector3 a{1.0f, 2.0f, 3.0f};
+    nathan::Vector3 b{1.0f, 2.0f, 3.0f};
+
+    EXPECT_TRUE(a == b);
+    EXPECT_FALSE(a != b);
+}
+
+TEST(Vector3Test, OperatorEqualsReturnsFalseForDifferentVectors) {
+    nathan::Vector3 a{1.0f, 2.0f, 3.0f};
+    nathan::Vector3 b{4.0f, 5.0f, 6.0f};
+
+    EXPECT_FALSE(a == b);
+    EXPECT_TRUE(a != b);
+}
+
+TEST(Vector3Test, OperatorEqualsReturnsTrueForApproximatelyEqualVectors) {
+    nathan::Vector3 a{1.0f, 2.0f, 3.0f};
+    nathan::Vector3 b{1.0f + 1e-6f, 2.0f - 1e-6f, 3.0f + 5e-6f};
+
+    EXPECT_TRUE(a == b);
+    EXPECT_FALSE(a != b);
+}
+
+TEST(Vector3Test, OperatorOutputStreamsVectorInExpectedFormat) {
+    nathan::Vector3 v{1.0f, 2.0f, 3.0f};
+
+    std::ostringstream oss;
+    oss << v;
+
+    std::string expected_output = "(1, 2, 3)";
+    EXPECT_EQ(oss.str(), expected_output);
+}
