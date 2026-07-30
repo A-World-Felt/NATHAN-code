@@ -65,6 +65,11 @@ void Engine::run() {
                     node_ptr->loop(fixed_dt);
                 }
             }
+            for (auto& node_ptr : node_pool_.get_pool()) {
+                if (!node_ptr->is_destroyed()) {
+                    node_ptr->after_loop(fixed_dt);
+                }
+            }
             accumulator -= fixed_dt;
         }
 
