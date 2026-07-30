@@ -78,6 +78,14 @@ void Transform::set_acceleration(float ax, float ay, float az) {
     acceleration_ = Vector3{ax, ay, az};
 }
 
+void Transform::set_angular_velocity(float degrees_per_second) {
+    angular_velocity_deg_ = degrees_per_second;
+}
+
+void Transform::set_angular_acceleration(float degrees_per_second_squared) {
+    angular_acceleration_deg_ = degrees_per_second_squared;
+}
+
 void Transform::set_static(bool is_static) {
     is_static_ = is_static;
 }
@@ -86,11 +94,16 @@ void Transform::integrate(float delta) {
     if (is_static_) {
         acceleration_ = Vector3{0.0f, 0.0f, 0.0f};
         velocity_ = Vector3{0.0f, 0.0f, 0.0f};
+        angular_acceleration_deg_ = 0.0f;
+        angular_velocity_deg_ = 0.0f;
         return;
     }
 
+    position_ += velocity_ * delta + acceleration_ * (0.5f * delta*delta);
     velocity_ += acceleration_ * delta;
-    position_ += velocity_ * delta;
+
+    rotation_deg_ += normalize_angle(angular_velocity_deg_ * delta + angular_acceleration_deg_ * (0.5f * delta*delta));
+    angular_velocity_deg_ += angular_acceleration_deg_ * delta;
 }
 
 }  // namespace nathan

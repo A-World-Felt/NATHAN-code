@@ -31,10 +31,10 @@ TEST(Node3DTest, AfterLoopIntegratesVelocityAndAccelerationIntoPosition) {
     node.get_transform().set_velocity(1.0f, 0.0f, 0.0f);
     node.get_transform().set_acceleration(0.0f, 2.0f, 0.0f);
 
-    node.after_loop(1.0f);  // delta = 1s
+    node.after_loop(1.0f);
 
     nathan::Vector3 expected_velocity = nathan::Vector3{1.0f, 2.0f, 0.0f};
-    nathan::Vector3 expected_position = nathan::Vector3{1.0f, 2.0f, 0.0f};
+    nathan::Vector3 expected_position = nathan::Vector3{1.0f, 1.0f, 0.0f};
     EXPECT_EQ(node.get_transform().get_velocity(), expected_velocity);
     EXPECT_EQ(node.get_transform().get_position(), expected_position);
 }

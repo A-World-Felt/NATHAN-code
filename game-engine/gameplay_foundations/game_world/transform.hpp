@@ -38,21 +38,28 @@ public:
     void set_acceleration(Vector3 acceleration);
     void set_acceleration(float ax, float ay, float az = 0.0f);
 
+    float get_angular_velocity() const { return angular_velocity_deg_; }
+    void set_angular_velocity(float degrees_per_second);
+
+    float get_angular_acceleration() const { return angular_acceleration_deg_; }
+    void set_angular_acceleration(float degrees_per_second_squared);
+
     bool is_static() const { return is_static_; }
     void set_static(bool is_static);
 
-    // Integrates acceleration -> velocity -> position for one tick.
-    // No-op if is_static() is true.
+    // Integrates acceleration -> velocity -> position for one tick if static is false.
     void integrate(float delta);
 
 private:
     static float normalize_angle(float degrees);
 
     Vector3 position_;
-    float rotation_deg_ = 0.0f;
-
     Vector3 velocity_;
     Vector3 acceleration_;
+    
+    float rotation_deg_ = 0.0f;
+    float angular_velocity_deg_ = 0.0f;
+    float angular_acceleration_deg_ = 0.0f;
 
     bool is_static_ = false;
 };

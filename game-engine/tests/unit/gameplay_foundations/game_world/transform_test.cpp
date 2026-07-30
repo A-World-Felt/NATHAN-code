@@ -242,6 +242,22 @@ TEST(TransformTest, SetAccelerationWithFloatsUpdatesAcceleration) {
     EXPECT_EQ(t.get_acceleration(), expected_acceleration);
 }
 
+TEST(TransformTest, SetAngularVelocityUpdatesValue) {
+    nathan::Transform t;
+
+    t.set_angular_velocity(45.0f);
+
+    EXPECT_FLOAT_EQ(t.get_angular_velocity(), 45.0f);
+}
+
+TEST(TransformTest, SetAngularAccelerationUpdatesValue) {
+    nathan::Transform t;
+
+    t.set_angular_acceleration(10.0f);
+
+    EXPECT_FLOAT_EQ(t.get_angular_acceleration(), 10.0f);
+}
+
 TEST(TransformTest, SetStaticUpdatesFlag) {
     nathan::Transform t;
 
@@ -250,17 +266,21 @@ TEST(TransformTest, SetStaticUpdatesFlag) {
     EXPECT_TRUE(t.is_static());
 }
 
-TEST(TransformTest, IntegrateUpdatesVelocityThenPositionWhenNotStatic) {
+TEST(TransformTest, IntegrateUpdatesValuesWhenNotStatic) {
     nathan::Transform t;
     t.set_acceleration(0.0f, 10.0f, 0.0f);
     t.set_velocity(1.0f, 0.0f, 0.0f);
+    t.set_angular_acceleration(5.0f);
+    t.set_angular_velocity(10.0f);
 
-    t.integrate(1.0f);  // delta = 1s
+    t.integrate(1.0f);
 
     nathan::Vector3 expected_velocity{1.0f, 10.0f, 0.0f};
-    nathan::Vector3 expected_position{1.0f, 10.0f, 0.0f};
+    nathan::Vector3 expected_position{1.0f, 5.0f, 0.0f};
     EXPECT_EQ(t.get_velocity(), expected_velocity);
     EXPECT_EQ(t.get_position(), expected_position);
+    EXPECT_FLOAT_EQ(t.get_angular_velocity(), 15.0f);
+    EXPECT_FLOAT_EQ(t.get_rotation(), 12.5f);
 }
 
 TEST(TransformTest, IntegrateIsNoOpWhenStatic) {
@@ -268,6 +288,8 @@ TEST(TransformTest, IntegrateIsNoOpWhenStatic) {
     t.set_static(true);
     t.set_acceleration(0.0f, 10.0f, 0.0f);
     t.set_velocity(1.0f, 0.0f, 0.0f);
+    t.set_angular_acceleration(5.0f);
+    t.set_angular_velocity(10.0f);
 
     t.integrate(1.0f);
 
@@ -277,18 +299,66 @@ TEST(TransformTest, IntegrateIsNoOpWhenStatic) {
     EXPECT_EQ(t.get_acceleration(), expected_acceleration);
     EXPECT_EQ(t.get_velocity(), expected_velocity);
     EXPECT_EQ(t.get_position(), expected_position);
+    EXPECT_FLOAT_EQ(t.get_angular_acceleration(), 0.0f);
+    EXPECT_FLOAT_EQ(t.get_angular_velocity(), 0.0f);
+    EXPECT_FLOAT_EQ(t.get_rotation(), 0.0f);
 }
 
-TEST(TransformTest, IntegrateAccumulatesOverMultipleTicks) {
+TEST(TransformTest, IntegrateAccumulatesLinearAndAngularMotionOverMultipleTicks) {
     nathan::Transform t;
-    t.set_acceleration(0.0f, 0.0f, 0.0f);
+    t.set_acceleration(0.0f, 10.0f, 0.0f);
     t.set_velocity(2.0f, 0.0f, 0.0f);
-
+    t.set_angular_acceleration(5.0f);
+    t.set_angular_velocity(10.0f);
+ 
     t.integrate(0.5f);
     t.integrate(0.5f);
-
-    nathan::Vector3 expected_position{2.0f, 0.0f, 0.0f};
+ 
+    nathan::Vector3 expected_velocity{2.0f, 10.0f, 0.0f};
+    nathan::Vector3 expected_position{2.0f, 5.0f, 0.0f};
+    EXPECT_EQ(t.get_velocity(), expected_velocity);
     EXPECT_EQ(t.get_position(), expected_position);
+    EXPECT_FLOAT_EQ(t.get_angular_velocity(), 15.0f);
+    EXPECT_FLOAT_EQ(t.get_rotation(), 12.5f);
+}
+ 
+TEST(TransformTest, IntegrateGivesSameResultRegardlessOfSubstepCount) {
+    nathan::Transform single_step;
+    single_step.set_acceleration(0.0f, 10.0f, 0.0f);
+    single_step.set_velocity(2.0f, 0.0f, 0.0f);
+    single_step.set_angular_acceleration(5.0f);
+    single_step.set_angular_velocity(10.0f);
+    single_step.integrate(1.0f);
+ 
+    nathan::Transform two_steps;
+    two_steps.set_acceleration(0.0f, 10.0f, 0.0f);
+    two_steps.set_velocity(2.0f, 0.0f, 0.0f);
+    two_steps.set_angular_acceleration(5.0f);
+    two_steps.set_angular_velocity(10.0f);
+    two_steps.integrate(0.5f);
+    two_steps.integrate(0.5f);
+ 
+    nathan::Transform four_steps;
+    four_steps.set_acceleration(0.0f, 10.0f, 0.0f);
+    four_steps.set_velocity(2.0f, 0.0f, 0.0f);
+    four_steps.set_angular_acceleration(5.0f);
+    four_steps.set_angular_velocity(10.0f);
+    four_steps.integrate(0.25f);
+    four_steps.integrate(0.25f);
+    four_steps.integrate(0.25f);
+    four_steps.integrate(0.25f);
+ 
+    EXPECT_EQ(single_step.get_position(), two_steps.get_position());
+    EXPECT_EQ(single_step.get_position(), four_steps.get_position());
+ 
+    EXPECT_EQ(single_step.get_velocity(), two_steps.get_velocity());
+    EXPECT_EQ(single_step.get_velocity(), four_steps.get_velocity());
+ 
+    EXPECT_FLOAT_EQ(single_step.get_rotation(), two_steps.get_rotation());
+    EXPECT_FLOAT_EQ(single_step.get_rotation(), four_steps.get_rotation());
+ 
+    EXPECT_FLOAT_EQ(single_step.get_angular_velocity(), two_steps.get_angular_velocity());
+    EXPECT_FLOAT_EQ(single_step.get_angular_velocity(), four_steps.get_angular_velocity());
 }
 
 
