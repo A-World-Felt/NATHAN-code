@@ -2,8 +2,6 @@
 
 namespace nathan {
 
-Node3D::Node3D() = default;
-
 void Node3D::after_loop(float delta) {
     transform.integrate(delta);
 }

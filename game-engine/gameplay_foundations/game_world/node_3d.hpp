@@ -10,7 +10,7 @@ namespace nathan {
 // A game object exists in a 3D space, but its functionnality is mainly 2D. Rotation is simplified to a single angle in degrees.
 class Node3D : public EventNode {
 public:
-    Node3D();
+    Node3D() = default;
     Node3D(Vector3 position) : transform(position) {};
     Node3D(float x, float y, float z = 0.0f) : transform(x, y, z) {};
     
