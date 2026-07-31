@@ -165,6 +165,7 @@ Everything in your game is a **Node** - players, enemies, UI elements, etc. Node
 
 - **Node** - Base class for entities without event capabilities
 - **EventNode** - Inherits from Node and EventEmitter; use for entities that emit/listen to events
+- **Node3D** - Inherits from EventNode; use for entities that are positioned in the world.
 
 ### Engine Injection
 Nodes receive their Engine pointer through:

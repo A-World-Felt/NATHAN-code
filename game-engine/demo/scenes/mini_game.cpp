@@ -8,7 +8,8 @@ namespace nathan {
 // PLAYER - Demonstrates: emitting events, subscribing to events
 
 void Player::setup() {
-    std::cout << "[Player] Created at (" << x_ << ", " << y_ << ")\n";
+    std::cout << "[Player] Created at (" << get_transform().get_position().x 
+              << ", " << get_transform().get_position().y << ")\n";
     
     on<CollisionEvent>("collision", [this](const CollisionEvent& event) {
         std::cout << "[Player] Collided with " << event.with 
@@ -40,12 +41,9 @@ void Player::setup() {
 }
 
 void Player::loop(float delta) {
-    // set_x(get_x() + get_speed() * delta);
-    // set_x(get_x() + get_axis_x() * get_speed() * delta);
-    // set_y(get_y() + get_axis_y() * get_speed() * delta);
-    x_ += axis_x_ * speed_ * delta;
-    y_ -= axis_y_ * speed_ * delta;
-    std::cout << "[Player] X: " << x_ << " Y: " << y_ << "\n";
+    get_transform().translate(axis_x_ * speed_ * delta, axis_y_ * speed_ * delta);
+
+    std::cout << "[Player] X: " << get_transform().get_position().x << " Y: " << get_transform().get_position().y << "\n";
     
     // int x_int = static_cast<int>(get_x());
     // if (x_int != get_last_position() && x_int <= 60) {
@@ -55,7 +53,7 @@ void Player::loop(float delta) {
     //     }
     // }
     
-    if (coins_collected_ == 0 && x_ >= 49.5f && y_ <= 50.5f) {
+    if (coins_collected_ == 0 && get_transform().get_position().x >= 49.5f && get_transform().get_position().y <= 50.5f) {
         std::cout << "[Player] Reached coin position! Triggering collision...\n";
         emit<CollisionEvent>("collision", {"coin", 2.5f});
         // set_coins_collected(1);
@@ -77,8 +75,8 @@ void Player::loop(float delta) {
 // COIN - Demonstrates: subscribing to events from other nodes
 
 void Coin::setup() {
-    std::cout << "[Coin] Created at (" << get_x() << ", " 
-              << get_y() << ") with value " << get_value() << "\n";
+    std::cout << "[Coin] Created at (" << get_transform().get_position().x << ", " 
+              << get_transform().get_position().y << ") with value " << get_value() << "\n";
     
     on<std::string>("position_update", [this](const std::string& pos) {
         std::cout << "[Coin] Heard position update: " << pos << "\n";
@@ -120,9 +118,11 @@ void MiniGame::setup() {
     player->set_name("Player");
     add_child(std::move(player));
     
-    auto coin = std::make_unique<Coin>();
+    // Spawn coin at (50, 50)
+    auto coin = std::make_unique<Coin>(50.0f, 50.0f);
     coin->set_name("Coin");
     add_child(std::move(coin));
+    
     
     auto score_display = std::make_unique<ScoreDisplay>();
     score_display->set_name("ScoreDisplay");
@@ -151,7 +151,7 @@ void MiniGame::loop(float delta) {
     timer_ += delta;
     // std::cout << "[MiniGame] Running... (" << timer_ << "s)\n";
     
-    if (timer_ >= 5.0f) {
+    if (timer_ >= 50.0f) {
         std::cout << "[MiniGame] User clicked 'Quit'\n";
         if (get_parent()) {
             if (auto* manager = dynamic_cast<DemoSceneManager*>(get_parent())) {

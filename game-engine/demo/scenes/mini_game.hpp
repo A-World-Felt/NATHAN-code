@@ -2,6 +2,7 @@
 #define GAME_ENGINE_DEMO_SCENES_MINI_GAME_H_
 
 #include "node/event_node.hpp"
+#include "game_world/node_3d.hpp"
 #include <string>
 #include <string_view>
 
@@ -20,12 +21,8 @@ struct ScoreEvent {
 
 // Game Entities
 
-class Player : public EventNode {
+class Player : public Node3D {
 public:
-    float get_x() const { return x_; }
-    void set_x(float x) { x_ = x; }
-    float get_y() const { return y_; }
-    void set_y(float y) { y_ = y; }
     float get_axis_x() const { return axis_x_; }
     void set_axis_x(float v) { axis_x_ = v; }
     float get_axis_y() const { return axis_y_; }
@@ -43,7 +40,6 @@ public:
     void loop(float delta) override;
 
 private:
-    float x_ = 0.0f, y_ = 0.0f;
     float axis_x_ = 0.0f, axis_y_ = 0.0f;
     float speed_ = 15.0f;
     int coins_collected_ = 0;
@@ -51,12 +47,9 @@ private:
     int last_position_ = 0;
 };
 
-class Coin : public EventNode {
+class Coin : public Node3D {
 public:
-    float get_x() const { return x_; }
-    void set_x(float x) { x_ = x; }
-    float get_y() const { return y_; }
-    void set_y(float y) { y_ = y; }
+    Coin(float x = 0.0f, float y = 0.0f) : Node3D(x, y, 0.0f) {}
     int get_value() const { return value_; }
     void set_value(int value) { value_ = value; }
     bool is_collected() const { return collected_; }
@@ -66,7 +59,6 @@ public:
     void loop(float delta) override;
 
 private:
-    float x_ = 50, y_ = 50;
     int value_ = 10;
     bool collected_ = false;
 };
