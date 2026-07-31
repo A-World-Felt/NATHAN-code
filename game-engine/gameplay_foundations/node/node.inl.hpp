@@ -12,6 +12,8 @@ inline void Node::setup() {}
 
 inline void Node::loop(float delta) {}
 
+inline void Node::after_loop(float delta) {}
+
 inline void Node::cleanup() {}
 
 inline void Node::add_child(std::unique_ptr<Node> child) {

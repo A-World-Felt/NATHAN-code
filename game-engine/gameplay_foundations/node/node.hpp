@@ -19,6 +19,7 @@ public:
     // Lifecycle methods - users override these
     virtual void setup();
     virtual void loop(float delta);
+    virtual void after_loop(float delta);
     virtual void cleanup();
 
     // Accessors

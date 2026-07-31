@@ -52,6 +52,15 @@ add_library(gameplay_foundations
 
     # Audio
     gameplay_foundations/audio/sound.hpp
+
+    # GameWorld
+    gameplay_foundations/game_world/transform.hpp
+    gameplay_foundations/game_world/transform.cpp
+    gameplay_foundations/game_world/node_3d.hpp
+    gameplay_foundations/game_world/node_3d.cpp
+
+    # Math
+    gameplay_foundations/math/vector3.hpp
 )
 
 target_include_directories(gameplay_foundations PUBLIC
@@ -59,6 +68,8 @@ target_include_directories(gameplay_foundations PUBLIC
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/node
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/events
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/engine
+    ${CMAKE_SOURCE_DIR}/gameplay_foundations/game_world
+    ${CMAKE_SOURCE_DIR}/gameplay_foundations/math
     ${CMAKE_SOURCE_DIR}/vendor/SDL/include
 )
 
