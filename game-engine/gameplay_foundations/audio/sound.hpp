@@ -11,8 +11,8 @@ namespace nathan {
 
 class Sound {
 public:
-    explicit Sound(const std::string_view path_to_file, const float gain = 1.0f, const float reverb = 1.0f)
-        : id_(get_next_id()), path_to_file_(path_to_file), rel_position_({.x = 0.0f,.y = 0.0f,.z = 0.0f}), gain_(gain), reverb_(reverb) {}
+    explicit Sound(const std::string_view path_to_file)
+        : id_(get_next_id()), path_to_file_(path_to_file), rel_position_({.x = 0.0f,.y = 0.0f,.z = 0.0f}), gain_(1.0f), reverb_(1.0f) {}
 
     uint64_t get_id() const { return id_; }
 

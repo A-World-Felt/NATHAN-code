@@ -4,8 +4,7 @@
 
 namespace nathan {
 
-Soundscape::Soundscape(EventBus &event_bus, Node3D* head_node)
-    : event_bus_(event_bus), head_node_(head_node) {
+Soundscape::Soundscape(EventBus &event_bus, Node3D* head_node) : event_bus_(event_bus), head_node_(head_node) {
     event_bus.on_global<SoundEvent>("play sound", [this](const SoundEvent &sound_event) {
         // Lock mutex for interprocess communication
         sounds_.emplace_back(sound_event);

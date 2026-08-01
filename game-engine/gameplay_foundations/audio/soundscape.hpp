@@ -15,7 +15,7 @@ public:
     explicit Soundscape(EventBus &event_bus, Node3D *head_node = nullptr);
 
     Node3D* get_node() const { return head_node_; }
-    void set_head_node (Node3D* node) {head_node_ = node; }
+    void set_head_node (Node3D* node) { head_node_ = node; }
 
     void update();
 
