@@ -1,7 +1,7 @@
 #ifndef GAME_ENGINE_ENGINE_ENGINE_H_
 #define GAME_ENGINE_ENGINE_ENGINE_H_
 
-#include "audio/sound.hpp"
+#include "audio/soundscape.hpp"
 #include "engine/node_pool.hpp"
 #include "events/event_bus.hpp"
 #include "inputs/iinput_device.hpp"
@@ -41,8 +41,8 @@ private:
     Node* root_;  // Raw pointer - owned by node_pool_
     NodePool node_pool_;  // Owns all nodes
     EventBus event_bus_;   // Owns the event bus
+    Soundscape soundscape_; // Owns the soundscape
     std::shared_ptr<IInputDevice> input_device_;
-    SoundScape sound_scape_;
     bool running_;
 };
 

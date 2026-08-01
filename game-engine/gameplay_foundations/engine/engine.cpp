@@ -1,15 +1,16 @@
 #include "engine/engine.hpp"
-#include "engine/node_pool.hpp"
-#include "node/node.hpp"
-#include "inputs/sdl/sdl_input_device.hpp"
 
 #include <chrono>
 #include <iostream>
 #include <thread>
 
+#include "engine/node_pool.hpp"
+#include "inputs/sdl/sdl_input_device.hpp"
+#include "node/node.hpp"
+
 namespace nathan {
 
-Engine::Engine() : root_(nullptr), sound_scape_(event_bus_), running_(true) {
+Engine::Engine() : root_(nullptr), soundscape_(event_bus_), running_(true) {
     input_device_ = std::make_shared<SDLInputDevice>(event_bus_);
 }
 
@@ -72,6 +73,8 @@ void Engine::run() {
             }
             accumulator -= fixed_dt;
         }
+
+        soundscape_.update();
 
         // Optional: prevent 100% CPU usage
         std::this_thread::sleep_for(std::chrono::milliseconds(1));

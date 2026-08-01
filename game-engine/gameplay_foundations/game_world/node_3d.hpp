@@ -1,5 +1,5 @@
-#ifndef GAME_ENGINE_GAME_OBJECT_H_
-#define GAME_ENGINE_GAME_OBJECT_H_
+#ifndef GAME_ENGINE_GAME_WORLD_NODE_3D_H_
+#define GAME_ENGINE_GAME_WORLD_NODE_3D_H_
 
 #include "node/event_node.hpp"
 #include "game_world/transform.hpp"
@@ -11,14 +11,14 @@ namespace nathan {
 class Node3D : public EventNode {
 public:
     Node3D() = default;
-    Node3D(Vector3 position) : transform(position) {};
-    Node3D(float x, float y, float z = 0.0f) : transform(x, y, z) {};
+    Node3D(const Vector3 position) : transform(position) {};
+    Node3D(const float x, const float y, const float z = 0.0f) : transform(x, y, z) {};
     
     Transform& get_transform() { return transform; }
     const Transform& get_transform() const { return transform; }
 
     // After loop integrates physics. Child classes can override it but they must call the base class version to ensure proper functionality.
-    void after_loop(float delta);
+    void after_loop(float delta) override;
 
 private:
     Transform transform;
@@ -26,4 +26,4 @@ private:
 
 }  // namespace nathan
 
-#endif  // GAME_ENGINE_GAME_OBJECT_H_
+#endif  // GAME_ENGINE_GAME_WORLD_NODE_3D_H_
