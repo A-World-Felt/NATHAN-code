@@ -20,6 +20,9 @@ public:
     // After loop integrates physics. Child classes can override it but they must call the base class version to ensure proper functionality.
     void after_loop(float delta) override;
 
+    // Set the node as the "user's ears"
+    void set_as_head_node();
+
 private:
     Transform transform;
 };

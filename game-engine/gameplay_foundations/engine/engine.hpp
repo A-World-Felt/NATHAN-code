@@ -37,6 +37,10 @@ public:
     EventBus& get_event_bus() { return event_bus_; }
     const EventBus& get_event_bus() const { return event_bus_; }
 
+    // Access to Soundscape
+    Soundscape& get_soundscape() { return soundscape_; }
+    const Soundscape& get_soundscape() const { return soundscape_; }
+
 private:
     Node* root_;  // Raw pointer - owned by node_pool_
     NodePool node_pool_;  // Owns all nodes
