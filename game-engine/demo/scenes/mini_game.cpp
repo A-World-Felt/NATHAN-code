@@ -8,6 +8,8 @@ namespace nathan {
 // PLAYER - Demonstrates: emitting events, subscribing to events
 
 void Player::setup() {
+    set_as_head_node();
+
     std::cout << "[Player] Created at (" << get_transform().get_position().x 
               << ", " << get_transform().get_position().y << ")\n";
     
@@ -55,7 +57,8 @@ void Player::loop(float delta) {
     
     if (coins_collected_ == 0 && get_transform().get_position().x >= 49.5f && get_transform().get_position().y <= 50.5f) {
         std::cout << "[Player] Reached coin position! Triggering collision...\n";
-        emit<CollisionEvent>("collision", {"coin", 2.5f});
+        emit<CollisionEvent>("collision", {.with = "coin", .force = 2.5f});
+        emit_global<SoundEvent>("play sound", { this, ".\\resource\\test.mp3" });
         // set_coins_collected(1);
     }
     
