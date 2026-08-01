@@ -45,6 +45,7 @@ private:
     int coins_collected_ = 0;
     int jump_count_ = 0;
     int last_position_ = 0;
+    Sound sound_ = Sound{R"(..\resource\ring.mp3)"};
 };
 
 class Coin : public Node3D {

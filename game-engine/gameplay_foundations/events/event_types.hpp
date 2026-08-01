@@ -12,26 +12,25 @@ class Node3D;
 class SoundEvent {
 public:
     enum class Type : uint8_t { kStatic, kDynamic };
-    enum class State : uint8_t { kPlaying, kStopped };
 
-    SoundEvent(EventNode *node, std::string_view path_to_file, Type sound_type = Type::kDynamic);
+    SoundEvent(EventNode *node, Sound& sound, Type sound_type = Type::kDynamic);
+
+    // Interface to modify the relative position in the Sound reference
+    void set_rel_position(const Node3D &head_node) const;
 
     EventNode* get_node() const { return node_; }
     void set_node(EventNode* node) { node_ = node; }
 
-    void set_rel_position(const Node3D &head_node);
+    Sound* get_sound() const { return sound_; }
+    void set_sound(Sound* sound) { sound_ = sound; }
 
     Type get_type() const { return type_; }
     void set_type(const Type sound_type) { type_ = sound_type; }
 
-    State get_state() const { return state_; }
-    void set_state(const State state) { state_ = state; }
-
 private:
     EventNode* node_;
-    Sound sound_;
+    Sound* sound_;
     Type type_;
-    State state_;
 };
 
 } // namespace nathan

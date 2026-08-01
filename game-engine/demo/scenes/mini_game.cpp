@@ -58,7 +58,7 @@ void Player::loop(float delta) {
     if (coins_collected_ == 0 && get_transform().get_position().x >= 49.5f && get_transform().get_position().y <= 50.5f) {
         std::cout << "[Player] Reached coin position! Triggering collision...\n";
         emit<CollisionEvent>("collision", {.with = "coin", .force = 2.5f});
-        emit_global<SoundEvent>("play sound", { this, ".\\resource\\test.mp3" });
+        emit_global<SoundEvent>("play_sound", { this, sound_ });
         // set_coins_collected(1);
     }
     

@@ -1,30 +1,34 @@
 #include "audio/soundscape.hpp"
 
+#include "sound.hpp"
 #include "node/event_node.hpp"
 
 namespace nathan {
 
-Soundscape::Soundscape(EventBus &event_bus, Node3D* head_node) : event_bus_(event_bus), head_node_(head_node) {
-    event_bus.on_global<SoundEvent>("play sound", [this](const SoundEvent &sound_event) {
-        // Lock mutex for interprocess communication
+Soundscape::Soundscape(EventBus &event_bus, Node3D* head_node) : head_node_(head_node) {
+    event_bus.on_global<SoundEvent>("play_sound", [this](const SoundEvent &sound_event) {
+        if (sound_event.get_sound()->get_state() == Sound::State::kFileNotFound)
+            return;
         sounds_.emplace_back(sound_event);
-    });
-
-    event_bus.on_global<SoundEvent>("stop sound", [this](const SoundEvent &sound_event) {
-        // Lock mutex for interprocess communication
-        // end_sounds_.push(sound.get_id());
     });
 }
 
 void Soundscape::update() {
     for (auto it = sounds_.begin(); it != sounds_.end();) {
-
-        if (it->get_node()->is_destroyed()) {
-            it->set_state(SoundEvent::State::kStopped);
+        // Deletion after one frame on State::kStopped
+        if (it->get_sound()->get_state() == Sound::State::kStopped) {
+            it = sounds_.erase(it);
+            continue;
         }
-        else if (head_node_ != nullptr && it->get_type() == SoundEvent::Type::kDynamic && it->get_state() == SoundEvent::State::kPlaying)
+
+        // Give one frame on State::kStopped to terminate the audio
+        if (it->get_node()->is_destroyed())
+            it->get_sound()->set_state(Sound::State::kStopped);
+        else if (head_node_ != nullptr && it->get_type() == SoundEvent::Type::kDynamic && it->get_sound()->get_state() == Sound::State::kPlaying)
             it->set_rel_position(*head_node_);
 
+        // Communication with audio module. To be determined.
+        // shared_sounds_.push(it->get_sound());
         ++it;
     }
 }
