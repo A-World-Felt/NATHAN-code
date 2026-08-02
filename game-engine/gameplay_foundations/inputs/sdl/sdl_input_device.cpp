@@ -21,6 +21,9 @@ SDLInputDevice::SDLInputDevice(EventBus& event_bus) : IInputDevice(event_bus) {
         gamepad = SDL_OpenGamepad(devices[0]);
         std::cout << "[InputDevice] Gamepad detected: " << SDL_GetGamepadName(gamepad) << std::endl;
     }
+    else
+        std::cout << "[InputDevice] Gamepad not detected" << std::endl;
+
     SDL_free(devices);
 }
 

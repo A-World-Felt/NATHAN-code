@@ -4,8 +4,8 @@
 
 namespace nathan {
 
-SoundEvent::SoundEvent(EventNode *node, Sound& sound, const Type sound_type)
-    : node_(node), sound_(&sound), type_(sound_type) {}
+SoundEvent::SoundEvent(EventNode *node, Sound& sound)
+    : node_(node), sound_(&sound) {}
 
 void SoundEvent::set_rel_position(const Node3D &head_node) const {
     if (const auto node_3d = dynamic_cast<Node3D*>(node_))
