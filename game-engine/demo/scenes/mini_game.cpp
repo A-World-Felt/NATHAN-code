@@ -24,19 +24,19 @@ void Player::setup() {
         std::cout << "[Player] Received welcome: " << msg << "\n";
     });
 
-    on_global<std::pair<GamepadAxis, float>>("axis_value_changed", [this](const std::pair<GamepadAxis, float>& axis) {
+    on_global<GamepadAxisEvent>("axis_value_changed", [this](const GamepadAxisEvent& event) {
         constexpr float kDeadzone = 0.1f;
-        const float val = std::abs(axis.second) < kDeadzone ? 0.0f : axis.second;
+        const float val = std::abs(event.val) < kDeadzone ? 0.0f : event.val;
 
-        if (axis.first == GamepadAxis::kXLeftJoystickAxis) {
+        if (event.gamepad_axis == GamepadAxis::kXLeftJoystickAxis) {
             axis_x_ = val;
-        } else if (axis.first == GamepadAxis::kYLeftJoystickAxis) {
+        } else if (event.gamepad_axis == GamepadAxis::kYLeftJoystickAxis) {
             axis_y_ = val;
         }
     });
 
-    on_global<GamepadButton>("button_pressed", [this](const GamepadButton& button) {
-        if (button == GamepadButton::kBottomFaceButton) {
+    on_global<GamepadButtonEvent>("button_pressed", [](const GamepadButtonEvent& event) {
+        if (event.gamepad_button == GamepadButton::kBottomFaceButton) {
             std::cout << "[Player] Jumping!\n";
         }
     });

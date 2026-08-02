@@ -15,7 +15,7 @@ public:
 
     virtual bool is_button_pressed(GamepadButton) = 0;
     virtual bool is_button_released(GamepadButton) = 0;
-    virtual int16_t get_axis_value(GamepadAxis) = 0;
+    virtual float get_axis_value(GamepadAxis) = 0; // [-1.0, 1.0]
 
 protected:
     explicit IInputDevice(EventBus& event_bus): event_bus_(event_bus) {}

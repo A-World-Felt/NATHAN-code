@@ -2,12 +2,25 @@
 #define GAME_ENGINE_EVENTS_EVENT_TYPES_H_
 
 #include "audio/sound.hpp"
+#include "inputs/input_types.hpp"
 
 namespace nathan {
 
 // Forward declarations
 class EventNode;
 class Node3D;
+
+struct GamepadButtonEvent {
+    enum class Action : uint8_t { kPressed, kReleased };
+
+    GamepadButton gamepad_button;
+    Action action;
+};
+
+struct  GamepadAxisEvent {
+    GamepadAxis gamepad_axis;
+    float val;
+};
 
 class SoundEvent {
 public:
