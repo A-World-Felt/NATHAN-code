@@ -11,9 +11,8 @@ class Node3D;
 
 class SoundEvent {
 public:
-    enum class Type : uint8_t { kStatic, kDynamic };
 
-    SoundEvent(EventNode *node, Sound& sound, Type sound_type = Type::kDynamic);
+    SoundEvent(EventNode *node, Sound& sound);
 
     // Interface to modify the relative position in the Sound reference
     void set_rel_position(const Node3D &head_node) const;
@@ -24,13 +23,9 @@ public:
     Sound* get_sound() const { return sound_; }
     void set_sound(Sound* sound) { sound_ = sound; }
 
-    Type get_type() const { return type_; }
-    void set_type(const Type sound_type) { type_ = sound_type; }
-
 private:
     EventNode* node_;
     Sound* sound_;
-    Type type_;
 };
 
 } // namespace nathan

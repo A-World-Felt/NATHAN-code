@@ -12,12 +12,12 @@ namespace nathan {
 
 class Sound {
 public:
-    enum class State : uint8_t { kPlaying, kStopped, kPaused, kFileNotFound };
+    enum class State : int8_t { kFileNotFound = -1, kPlaying, kPaused, kStopped  };
 
     explicit Sound(const std::filesystem::path& path_to_file)
         : id_(get_next_id()),
             path_to_file_(path_to_file.is_absolute() ? path_to_file : std::filesystem::absolute(path_to_file)),
-            rel_position_({.x = 0.0f,.y = 0.0f,.z = 0.0f}),
+            rel_position_({.x = 0.0f, .y = 0.0f, .z = 0.0f}),
             state_(State::kPlaying),
             gain_(1.0f),
             reverb_(1.0f) {

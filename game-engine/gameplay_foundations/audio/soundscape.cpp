@@ -16,7 +16,7 @@ Soundscape::Soundscape(EventBus &event_bus, Node3D* head_node) : head_node_(head
 void Soundscape::update() {
     for (auto it = sounds_.begin(); it != sounds_.end();) {
         // Deletion after one frame on State::kStopped
-        if (it->get_sound()->get_state() == Sound::State::kStopped) {
+        if (!it->get_node() || it->get_sound()->get_state() == Sound::State::kStopped) {
             it = sounds_.erase(it);
             continue;
         }
@@ -24,7 +24,7 @@ void Soundscape::update() {
         // Give one frame on State::kStopped to terminate the audio
         if (it->get_node()->is_destroyed())
             it->get_sound()->set_state(Sound::State::kStopped);
-        else if (head_node_ != nullptr && it->get_type() == SoundEvent::Type::kDynamic && it->get_sound()->get_state() == Sound::State::kPlaying)
+        else if (head_node_ && it->get_sound()->get_state() == Sound::State::kPlaying)
             it->set_rel_position(*head_node_);
 
         // Communication with audio module. To be determined.
