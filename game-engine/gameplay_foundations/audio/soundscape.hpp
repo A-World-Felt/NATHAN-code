@@ -18,13 +18,15 @@ public:
 
     Node3D* get_head_node() const { return head_node_; }
     void set_head_node (Node3D* node) { head_node_ = node; }
+    
+    [[maybe_unused]] std::vector<SoundEvent> get_sounds() const { return sounds_; }
 
     void update();
 
 private:
     Node3D* head_node_;
     std::vector<SoundEvent> sounds_{};
-    std::queue<Sound*> shared_sounds_{};
+    // std::queue<Sound*> shared_sounds_{};
 };
 
 } // namespace nathan
