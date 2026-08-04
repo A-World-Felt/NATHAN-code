@@ -2,7 +2,6 @@
 #define GAME_ENGINE_EVENTS_EVENT_TYPES_H_
 
 #include "audio/sound.hpp"
-#include "game_world/node_3d.hpp"
 #include "inputs/input_types.hpp"
 
 namespace nathan {
@@ -32,7 +31,7 @@ public:
     void set_rel_position(const Node3D &head_node) const;
 
     EventNode* get_node() const { return node_; }
-    void set_node(EventNode* node) { node_ = node; node_3d_ = dynamic_cast<Node3D*>(node); }
+    void set_node(EventNode* node);
 
     Sound* get_sound() const { return sound_; }
     void set_sound(Sound* sound) { sound_ = sound; }
