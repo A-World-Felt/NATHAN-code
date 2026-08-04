@@ -14,6 +14,7 @@ void SoundEvent::set_rel_position(const Node3D &head_node) const {
 
 void SoundEvent::set_node(EventNode *node) {
     node_ = node;
+    // Copy of the node but give access to transform functions
     node_3d_ = dynamic_cast<Node3D*>(node);
 }
 
