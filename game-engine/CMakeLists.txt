@@ -30,7 +30,9 @@ add_library(gameplay_foundations
     gameplay_foundations/events/connection.hpp
     gameplay_foundations/events/event_emitter.hpp
     gameplay_foundations/events/event_bus.hpp
-    
+    gameplay_foundations/events/event_types.hpp
+    gameplay_foundations/events/event_types.cpp
+
     # Node
     gameplay_foundations/node/node.hpp
     gameplay_foundations/node/node.inl.hpp
@@ -50,6 +52,11 @@ add_library(gameplay_foundations
     gameplay_foundations/inputs/sdl/sdl_input_device.hpp
     gameplay_foundations/inputs/input_types.hpp
 
+    # Audio
+    gameplay_foundations/audio/sound.hpp
+    gameplay_foundations/audio/soundscape.hpp
+    gameplay_foundations/audio/soundscape.cpp
+
     # GameWorld
     gameplay_foundations/game_world/transform.hpp
     gameplay_foundations/game_world/transform.cpp
@@ -67,6 +74,8 @@ target_include_directories(gameplay_foundations PUBLIC
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/engine
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/game_world
     ${CMAKE_SOURCE_DIR}/gameplay_foundations/math
+    ${CMAKE_SOURCE_DIR}/gameplay_foundations/inputs
+    ${CMAKE_SOURCE_DIR}/gameplay_foundations/audio
     ${CMAKE_SOURCE_DIR}/vendor/SDL/include
 )
 

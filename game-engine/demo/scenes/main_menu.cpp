@@ -9,7 +9,7 @@ namespace nathan {
 void MainMenu::setup() {
     std::cout << "[MainMenu] Setup\n";
     std::cout << "[MainMenu] Press any button to start...\n";
-    on_global<GamepadButton>("button_pressed", [this](const GamepadButton& _) {
+    on_global<GamepadButtonEvent>("button_pressed", [this](const GamepadButtonEvent& _) {
         is_game_started_ = true;
     });
 }

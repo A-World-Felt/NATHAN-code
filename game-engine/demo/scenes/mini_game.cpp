@@ -8,6 +8,8 @@ namespace nathan {
 // PLAYER - Demonstrates: emitting events, subscribing to events
 
 void Player::setup() {
+    set_as_head_node();
+
     std::cout << "[Player] Created at (" << get_transform().get_position().x 
               << ", " << get_transform().get_position().y << ")\n";
     
@@ -22,19 +24,19 @@ void Player::setup() {
         std::cout << "[Player] Received welcome: " << msg << "\n";
     });
 
-    on_global<std::pair<GamepadAxis, float>>("axis_value_changed", [this](const std::pair<GamepadAxis, float>& axis) {
+    on_global<GamepadAxisEvent>("axis_value_changed", [this](const GamepadAxisEvent& event) {
         constexpr float kDeadzone = 0.1f;
-        const float val = std::abs(axis.second) < kDeadzone ? 0.0f : axis.second;
+        const float val = std::abs(event.val) < kDeadzone ? 0.0f : event.val;
 
-        if (axis.first == GamepadAxis::kXLeftJoystickAxis) {
+        if (event.gamepad_axis == GamepadAxis::kXLeftJoystickAxis) {
             axis_x_ = val;
-        } else if (axis.first == GamepadAxis::kYLeftJoystickAxis) {
+        } else if (event.gamepad_axis == GamepadAxis::kYLeftJoystickAxis) {
             axis_y_ = val;
         }
     });
 
-    on_global<GamepadButton>("button_pressed", [this](const GamepadButton& button) {
-        if (button == GamepadButton::kBottomFaceButton) {
+    on_global<GamepadButtonEvent>("button_pressed", [](const GamepadButtonEvent& event) {
+        if (event.gamepad_button == GamepadButton::kBottomFaceButton) {
             std::cout << "[Player] Jumping!\n";
         }
     });
@@ -55,7 +57,8 @@ void Player::loop(float delta) {
     
     if (coins_collected_ == 0 && get_transform().get_position().x >= 49.5f && get_transform().get_position().y <= 50.5f) {
         std::cout << "[Player] Reached coin position! Triggering collision...\n";
-        emit<CollisionEvent>("collision", {"coin", 2.5f});
+        emit<CollisionEvent>("collision", {.with = "coin", .force = 2.5f});
+        emit_global<SoundEvent>("play_sound", { this, sound_ });
         // set_coins_collected(1);
     }
     

@@ -1,12 +1,13 @@
 // Unit tests for SDLInputDevice using Google Test and Google Mock
 
 #include "inputs/sdl/sdl_input_device.hpp"
-#include "events/event_bus.hpp"
 
-#include <SDL3/SDL_gamepad.h>
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include <stdexcept>
+#include <gtest/gtest.h>
+#include <SDL3/SDL_gamepad.h>
+
+#include "events/event_bus.hpp"
+#include "events/event_types.hpp"
 
 namespace nathan {
 namespace {
@@ -19,7 +20,7 @@ protected:
     // Builds a minimal SDL_Event for a gamepad button transition.
     static SDL_Event MakeButtonEvent(const SDL_EventType type, const SDL_GamepadButton button) {
         SDL_Event event{};
-        event.type = static_cast<Uint32>(type);
+        event.type = type;
         event.gbutton.type = type;
         event.gbutton.button = button;
         return event;
@@ -35,22 +36,29 @@ protected:
         return event;
     }
 
+    // Builds a minimal SDL_Event for a gamepad device add/remove.
+    static SDL_Event MakeDeviceEvent(const SDL_EventType type, const SDL_JoystickID which) {
+        SDL_Event event{};
+        event.type = type;
+        event.gdevice.type = type;
+        event.gdevice.which = which;
+        return event;
+    }
+
     EventBus event_bus_;
     SDLInputDevice device_;
 };
 
+}  // namespace
+
 // ---------------------------------------------------------------------
 // SDL_GamepadButton / SDL_GamepadAxis -> engine enum mapping
-//
-// to_engine() is private, so these confirm the mapping through the
-// "button_pressed"/"axis_value_changed" events that handle_event() emits,
-// rather than calling to_engine() directly.
 // ---------------------------------------------------------------------
 
 TEST_F(SDLInputDeviceTest, NorthButtonMapsCorrectly) {
     GamepadButton received = GamepadButton::kInvalidButton;
-    event_bus_.on_global<GamepadButton>("button_pressed",
-        [&](const GamepadButton& button) { received = button; });
+    event_bus_.on_global<GamepadButtonEvent>("button_pressed",
+        [&](const GamepadButtonEvent& event) { received = event.gamepad_button; });
 
     device_.handle_event(MakeButtonEvent(SDL_EVENT_GAMEPAD_BUTTON_DOWN, SDL_GAMEPAD_BUTTON_NORTH));
 
@@ -59,31 +67,22 @@ TEST_F(SDLInputDeviceTest, NorthButtonMapsCorrectly) {
 
 TEST_F(SDLInputDeviceTest, InvalidButtonMapsCorrectly) {
     GamepadButton received = GamepadButton::kTopFaceButton;  // sentinel, overwritten if the callback fires
-    event_bus_.on_global<GamepadButton>("button_pressed",
-        [&](const GamepadButton& button) { received = button; });
+    event_bus_.on_global<GamepadButtonEvent>("button_pressed",
+        [&](const GamepadButtonEvent& event) { received = event.gamepad_button; });
 
-    // SDL_GAMEPAD_BUTTON_BACK isn't handled in to_engine()'s switch, so it
-    // maps to kInvalidButton (-1). The event still fires with that value,
-    // but the subsequent current_button_.at(static_cast<uint8_t>(-1))
-    // (i.e. .at(255)) is out of range for the 13-element array, so
-    // handle_event() throws std::out_of_range. That's existing behavior in
-    // the production code, not something introduced by this test - flagging
-    // in case it's not intentional.
-    EXPECT_THROW(
-        device_.handle_event(MakeButtonEvent(SDL_EVENT_GAMEPAD_BUTTON_DOWN, SDL_GAMEPAD_BUTTON_BACK)),
-        std::out_of_range);
+    device_.handle_event(MakeButtonEvent(SDL_EVENT_GAMEPAD_BUTTON_DOWN, SDL_GAMEPAD_BUTTON_BACK));
 
     EXPECT_EQ(received, GamepadButton::kInvalidButton);
 }
 
 TEST_F(SDLInputDeviceTest, LeftXAxisMapsCorrectly) {
-    std::pair<GamepadAxis, float> received{GamepadAxis::kInvalidAxis, 0.0f};
-    event_bus_.on_global<std::pair<GamepadAxis, float>>("axis_value_changed",
-        [&](const std::pair<GamepadAxis, float>& payload) { received = payload; });
+    GamepadAxis received = GamepadAxis::kInvalidAxis;
+    event_bus_.on_global<GamepadAxisEvent>("axis_value_changed",
+        [&](const GamepadAxisEvent& event) { received = event.gamepad_axis; });
 
     device_.handle_event(MakeAxisEvent(SDL_GAMEPAD_AXIS_LEFTX, 16384));
 
-    EXPECT_EQ(received.first, GamepadAxis::kXLeftJoystickAxis);
+    EXPECT_EQ(received, GamepadAxis::kXLeftJoystickAxis);
 }
 
 // ---------------------------------------------------------------------
@@ -123,7 +122,8 @@ TEST_F(SDLInputDeviceTest, ButtonReleasedReturnsTrue) {
 TEST_F(SDLInputDeviceTest, AxisValueReturnedCorrectly) {
     device_.handle_event(MakeAxisEvent(SDL_GAMEPAD_AXIS_LEFTX, 12345));
 
-    EXPECT_EQ(device_.get_axis_value(GamepadAxis::kXLeftJoystickAxis), 12345);
+    EXPECT_FLOAT_EQ(device_.get_axis_value(GamepadAxis::kXLeftJoystickAxis),
+                     12345.0f / SDL_MAX_SINT16);
 }
 
 // ---------------------------------------------------------------------
@@ -153,7 +153,8 @@ TEST_F(SDLInputDeviceTest, HandleButtonUpUpdatesState) {
 TEST_F(SDLInputDeviceTest, HandleAxisMotionUpdatesAxis) {
     device_.handle_event(MakeAxisEvent(SDL_GAMEPAD_AXIS_RIGHTY, -20000));
 
-    EXPECT_EQ(device_.get_axis_value(GamepadAxis::kYRightJoystickAxis), -20000);
+    EXPECT_FLOAT_EQ(device_.get_axis_value(GamepadAxis::kYRightJoystickAxis),
+                     -20000.0f / SDL_MIN_SINT16);
 }
 
 // ---------------------------------------------------------------------
@@ -161,50 +162,70 @@ TEST_F(SDLInputDeviceTest, HandleAxisMotionUpdatesAxis) {
 // ---------------------------------------------------------------------
 
 TEST_F(SDLInputDeviceTest, ButtonDownEmitsEvent) {
-    GamepadButton received = GamepadButton::kInvalidButton;
+    GamepadButtonEvent received{GamepadButton::kInvalidButton, GamepadButtonEvent::Action::kReleased};
     bool called = false;
-    event_bus_.on_global<GamepadButton>("button_pressed",
-        [&](const GamepadButton& button) {
+    event_bus_.on_global<GamepadButtonEvent>("button_pressed",
+        [&](const GamepadButtonEvent& event) {
             called = true;
-            received = button;
+            received = event;
         });
 
     device_.handle_event(MakeButtonEvent(SDL_EVENT_GAMEPAD_BUTTON_DOWN, SDL_GAMEPAD_BUTTON_SOUTH));
 
     EXPECT_TRUE(called);
-    EXPECT_EQ(received, GamepadButton::kBottomFaceButton);
+    EXPECT_EQ(received.gamepad_button, GamepadButton::kBottomFaceButton);
+    EXPECT_EQ(received.action, GamepadButtonEvent::Action::kPressed);
 }
 
 TEST_F(SDLInputDeviceTest, ButtonUpEmitsEvent) {
-    GamepadButton received = GamepadButton::kInvalidButton;
+    GamepadButtonEvent received{GamepadButton::kInvalidButton, GamepadButtonEvent::Action::kPressed};
     bool called = false;
-    event_bus_.on_global<GamepadButton>("button_released",
-        [&](const GamepadButton& button) {
+    event_bus_.on_global<GamepadButtonEvent>("button_released",
+        [&](const GamepadButtonEvent& event) {
             called = true;
-            received = button;
+            received = event;
         });
 
     device_.handle_event(MakeButtonEvent(SDL_EVENT_GAMEPAD_BUTTON_UP, SDL_GAMEPAD_BUTTON_SOUTH));
 
     EXPECT_TRUE(called);
-    EXPECT_EQ(received, GamepadButton::kBottomFaceButton);
+    EXPECT_EQ(received.gamepad_button, GamepadButton::kBottomFaceButton);
+    EXPECT_EQ(received.action, GamepadButtonEvent::Action::kReleased);
 }
 
 TEST_F(SDLInputDeviceTest, AxisMotionEmitsEvent) {
-    std::pair<GamepadAxis, float> received{GamepadAxis::kInvalidAxis, 0.0f};
+    GamepadAxisEvent received{GamepadAxis::kInvalidAxis, 0.0f};
     bool called = false;
-    event_bus_.on_global<std::pair<GamepadAxis, float>>("axis_value_changed",
-        [&](const std::pair<GamepadAxis, float>& payload) {
+    event_bus_.on_global<GamepadAxisEvent>("axis_value_changed",
+        [&](const GamepadAxisEvent& event) {
             called = true;
-            received = payload;
+            received = event;
         });
 
     device_.handle_event(MakeAxisEvent(SDL_GAMEPAD_AXIS_LEFTX, 16384));
 
     EXPECT_TRUE(called);
-    EXPECT_EQ(received.first, GamepadAxis::kXLeftJoystickAxis);
-    EXPECT_FLOAT_EQ(received.second, 16384.0f / SDL_MAX_SINT16);
+    EXPECT_EQ(received.gamepad_axis, GamepadAxis::kXLeftJoystickAxis);
+    EXPECT_FLOAT_EQ(received.val, 16384.0f / SDL_MAX_SINT16);
 }
 
-}  // namespace
+// ---------------------------------------------------------------------
+// Gamepad added/removed - smoke tests only (no accessor for `gamepad`)
+// ---------------------------------------------------------------------
+
+TEST_F(SDLInputDeviceTest, HandleGamepadAddedWithBogusIdDoesNotCrash) {
+    // SDL_IsGamepad() should return false for a device id that was never
+    // actually plugged in, so this should be a no-op rather than trying to
+    // open a nonexistent device.
+    EXPECT_NO_THROW(
+        device_.handle_event(MakeDeviceEvent(SDL_EVENT_GAMEPAD_ADDED, /*which=*/9999)));
+}
+
+TEST_F(SDLInputDeviceTest, HandleGamepadRemovedWithNoGamepadDoesNotCrash) {
+    // No real gamepad is connected in this environment, so `gamepad` should
+    // already be null and the removal branch should be skipped entirely.
+    EXPECT_NO_THROW(
+        device_.handle_event(MakeDeviceEvent(SDL_EVENT_GAMEPAD_REMOVED, /*which=*/9999)));
+}
+
 }  // namespace nathan
