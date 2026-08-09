@@ -71,16 +71,7 @@ TEST_F(SDLInputDeviceTest, InvalidButtonMapsCorrectly) {
     event_bus_.on_global<GamepadButtonEvent>("button_pressed",
         [&](const GamepadButtonEvent& event) { received = event.gamepad_button; });
 
-    // SDL_GAMEPAD_BUTTON_BACK isn't handled in to_engine()'s switch, so it
-    // maps to kInvalidButton (-1). The event still fires with that value,
-    // but the subsequent current_button_.at(static_cast<uint8_t>(-1))
-    // (i.e. .at(255)) is out of range for the 13-element array, so
-    // handle_event() throws std::out_of_range. That's existing behavior in
-    // the production code, not something introduced by this test - flagging
-    // in case it's not intentional.
-    EXPECT_THROW(
-        device_.handle_event(MakeButtonEvent(SDL_EVENT_GAMEPAD_BUTTON_DOWN, SDL_GAMEPAD_BUTTON_BACK)),
-        std::out_of_range);
+    device_.handle_event(MakeButtonEvent(SDL_EVENT_GAMEPAD_BUTTON_DOWN, SDL_GAMEPAD_BUTTON_BACK));
 
     EXPECT_EQ(received, GamepadButton::kInvalidButton);
 }
