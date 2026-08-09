@@ -4,7 +4,7 @@
 #include <iostream>
 #include <SDL3/SDL_init.h>
 
-#include "event_types.hpp"
+#include "events/event_types.hpp"
 
 namespace nathan {
 
@@ -38,6 +38,13 @@ void SDLInputDevice::update() {
 
 void SDLInputDevice::new_frame() {
     previous_button_ = current_button_;
+}
+
+SDLInputDevice::~SDLInputDevice() {
+    SDL_CloseGamepad(gamepad);
+    gamepad = nullptr;
+
+    SDL_Quit();
 }
 
 bool SDLInputDevice::is_button_pressed(const GamepadButton gb) {
@@ -95,7 +102,8 @@ void SDLInputDevice::handle_event(const SDL_Event &event) {
     }
     else if (event.type == SDL_EVENT_GAMEPAD_AXIS_MOTION) {
         GamepadAxis gamepad_axis = to_engine(static_cast<SDL_GamepadAxis>(event.gaxis.axis));
-        const auto val = static_cast<float>(event.gaxis.value) / SDL_MAX_SINT16;
+        const float val = static_cast<float>(event.gaxis.value) /
+            (event.gaxis.value < 0 ? static_cast<float>(SDL_MIN_SINT16) : static_cast<float>(SDL_MAX_SINT16));
         event_bus_.emit_global<GamepadAxisEvent>(
             "axis_value_changed", {.gamepad_axis = gamepad_axis, .val = val}
         );

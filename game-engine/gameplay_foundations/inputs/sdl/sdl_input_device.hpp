@@ -14,6 +14,7 @@ public:
     explicit SDLInputDevice(EventBus& event_bus);
     void update() override;
     void new_frame() override;
+    ~SDLInputDevice() override;
 
     void handle_event(const SDL_Event &event);
 

@@ -19,7 +19,7 @@ public:
     Node3D* get_head_node() const { return head_node_; }
     void set_head_node (Node3D* node) { head_node_ = node; }
     
-    [[maybe_unused]] std::vector<SoundEvent> get_sounds() const { return sounds_; }
+    [[maybe_unused]] std::vector<SoundEvent>& get_sounds() { return sounds_; }
 
     void update();
 

@@ -6,7 +6,6 @@
 #include <gtest/gtest.h>
 #include <SDL3/SDL_gamepad.h>
 
-#include "stdexcept"
 #include "events/event_bus.hpp"
 #include "events/event_types.hpp"
 
@@ -155,7 +154,7 @@ TEST_F(SDLInputDeviceTest, HandleAxisMotionUpdatesAxis) {
     device_.handle_event(MakeAxisEvent(SDL_GAMEPAD_AXIS_RIGHTY, -20000));
 
     EXPECT_FLOAT_EQ(device_.get_axis_value(GamepadAxis::kYRightJoystickAxis),
-                     -20000.0f / SDL_MAX_SINT16);
+                     -20000.0f / SDL_MIN_SINT16);
 }
 
 // ---------------------------------------------------------------------
