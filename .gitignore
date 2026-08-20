@@ -1,0 +1,33 @@
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# CircuitPython specific
+*.mpy
+build/
+dist/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# System files
+.DS_Store
+Thumbs.db
+System Volume Information/
+
+# Temporary files
+*.tmp
+*.bak
+*.log
+
+# Virtual environments
+venv/
+env/
+ENV/
